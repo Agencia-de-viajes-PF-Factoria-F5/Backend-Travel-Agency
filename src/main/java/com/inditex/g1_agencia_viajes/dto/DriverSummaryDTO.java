@@ -7,6 +7,7 @@ public class DriverSummaryDTO {
 
     private Long id;
     private String name;
-    private String lastName;
-    private String license;
+    private String phone;
+    private String enrollment;
+    private Boolean licenceActive;
 }

@@ -16,8 +16,13 @@ public class Driver {
     private String name;
 
     @Column(nullable = false)
-    private String lastName;
+    private String phone;
 
     @Column(nullable = false, unique = true)
-    private String license;
+    private String enrollment;
+
+    @Column(nullable = false)
+    private Boolean licenceActive = true;
+
+    private String imageUrl;
 }

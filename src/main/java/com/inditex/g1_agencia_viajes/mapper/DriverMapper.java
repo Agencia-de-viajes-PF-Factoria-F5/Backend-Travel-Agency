@@ -12,8 +12,9 @@ public class DriverMapper {
         DriverSummaryDTO dto = new DriverSummaryDTO();
         dto.setId(driver.getId());
         dto.setName(driver.getName());
-        dto.setLastName(driver.getLastName());
-        dto.setLicense(driver.getLicense());
+        dto.setPhone(driver.getPhone());
+        dto.setEnrollment(driver.getEnrollment());
+        dto.setLicenceActive(driver.getLicenceActive());
         return dto;
     }
 }
