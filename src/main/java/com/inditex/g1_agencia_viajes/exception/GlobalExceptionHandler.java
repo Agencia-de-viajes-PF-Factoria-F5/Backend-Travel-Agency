@@ -12,7 +12,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(
             MethodArgumentNotValidException ex) {
@@ -23,7 +22,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(
             ResourceNotFoundException ex) {
@@ -32,12 +30,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntime(
-            RuntimeException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
+    // RuntimeException comentado temporalmente para no bloquear Swagger
+    // @ExceptionHandler(RuntimeException.class)
+    // public ResponseEntity<Map<String, String>> handleRuntime(
+    //         RuntimeException ex) {
+    //     Map<String, String> error = new HashMap<>();
+    //     error.put("error", ex.getMessage());
+    //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    // }
 }
