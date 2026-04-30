@@ -5,19 +5,19 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "conductores")
-public class Conductor {
+@Table(name = "drivers")
+public class Driver {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String nombre;
+    private String name;
 
     @Column(nullable = false)
-    private String apellidos;
+    private String lastName;
 
     @Column(nullable = false, unique = true)
-    private String licencia;
+    private String license;
 }

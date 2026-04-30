@@ -3,11 +3,11 @@ package com.inditex.g1_agencia_viajes.service;
 import com.inditex.g1_agencia_viajes.dto.BusRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BusResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
-import com.inditex.g1_agencia_viajes.mapper.ConductorMapper;
+import com.inditex.g1_agencia_viajes.mapper.DriverMapper;
 import com.inditex.g1_agencia_viajes.model.Bus;
-import com.inditex.g1_agencia_viajes.model.Conductor;
+import com.inditex.g1_agencia_viajes.model.Driver;
 import com.inditex.g1_agencia_viajes.repository.BusRepository;
-import com.inditex.g1_agencia_viajes.repository.ConductorRepository;
+import com.inditex.g1_agencia_viajes.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 public class BusServiceImpl implements BusService {
 
     private final BusRepository busRepository;
-    private final ConductorRepository conductorRepository;
-    private final ConductorMapper conductorMapper;
+    private final DriverRepository driverRepository;
+    private final DriverMapper driverMapper;
 
     @Override
     public List<BusResponseDTO> getAll() {
@@ -33,14 +33,14 @@ public class BusServiceImpl implements BusService {
     @Override
     public BusResponseDTO getById(Long id) {
         Bus bus = busRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Autobús no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
         return toResponseDTO(bus);
     }
 
     @Override
     public BusResponseDTO create(BusRequestDTO dto) {
         if (busRepository.existsByLicensePlate(dto.getLicensePlate())) {
-            throw new RuntimeException("Ya existe un autobús con la matrícula: " + dto.getLicensePlate());
+            throw new RuntimeException("A bus with this license plate already exists: " + dto.getLicensePlate());
         }
         return toResponseDTO(busRepository.save(toEntity(dto)));
     }
@@ -48,19 +48,19 @@ public class BusServiceImpl implements BusService {
     @Override
     public BusResponseDTO update(Long id, BusRequestDTO dto) {
         Bus bus = busRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Autobús no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
         bus.setLicensePlate(dto.getLicensePlate());
         bus.setBrand(dto.getBrand());
         bus.setCapacity(dto.getCapacity());
         bus.setYear(dto.getYear());
-        bus.setConductor(resolveConductor(dto.getConductorId()));
+        bus.setDriver(resolveDriver(dto.getDriverId()));
         return toResponseDTO(busRepository.save(bus));
     }
 
     @Override
     public void delete(Long id) {
         if (!busRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Autobús no encontrado con id: " + id);
+            throw new ResourceNotFoundException("Bus not found with id: " + id);
         }
         busRepository.deleteById(id);
     }
@@ -74,7 +74,7 @@ public class BusServiceImpl implements BusService {
         dto.setCapacity(bus.getCapacity());
         dto.setYear(bus.getYear());
         dto.setAvailable(bus.getAvailable());
-        dto.setConductor(conductorMapper.toResumenDTO(bus.getConductor()));
+        dto.setDriver(driverMapper.toSummaryDTO(bus.getDriver()));
         return dto;
     }
 
@@ -84,13 +84,13 @@ public class BusServiceImpl implements BusService {
         bus.setBrand(dto.getBrand());
         bus.setCapacity(dto.getCapacity());
         bus.setYear(dto.getYear());
-        bus.setConductor(resolveConductor(dto.getConductorId()));
+        bus.setDriver(resolveDriver(dto.getDriverId()));
         return bus;
     }
 
-    private Conductor resolveConductor(Long conductorId) {
-        if (conductorId == null) return null;
-        return conductorRepository.findById(conductorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con id: " + conductorId));
+    private Driver resolveDriver(Long driverId) {
+        if (driverId == null) return null;
+        return driverRepository.findById(driverId)
+                .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + driverId));
     }
 }

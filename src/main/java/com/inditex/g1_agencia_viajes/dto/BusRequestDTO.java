@@ -8,17 +8,17 @@ import lombok.Data;
 @Data
 public class BusRequestDTO {
 
-    @NotBlank(message = "La matrícula es obligatoria")
+    @NotBlank(message = "License plate is required")
     private String licensePlate;
 
-    @NotBlank(message = "La marca es obligatoria")
+    @NotBlank(message = "Brand is required")
     private String brand;
 
-    @NotNull(message = "La capacidad es obligatoria")
-    @Min(value = 1, message = "La capacidad debe ser mayor que 0")
+    @NotNull(message = "Capacity is required")
+    @Min(value = 1, message = "Capacity must be greater than 0")
     private Integer capacity;
 
     private Integer year;
 
-    private Long conductorId; // solo el ID
+    private Long driverId;
 }

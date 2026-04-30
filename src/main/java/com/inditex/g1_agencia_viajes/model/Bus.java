@@ -27,6 +27,6 @@ public class Bus {
     private Boolean available = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conductor_id")
-    private Conductor conductor;
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
 }

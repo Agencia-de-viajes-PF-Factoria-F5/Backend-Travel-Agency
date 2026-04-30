@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    // RuntimeException comentado temporalmente para no bloquear Swagger
+    // RuntimeException temporarily commented out to avoid blocking Swagger
     // @ExceptionHandler(RuntimeException.class)
     // public ResponseEntity<Map<String, String>> handleRuntime(
     //         RuntimeException ex) {

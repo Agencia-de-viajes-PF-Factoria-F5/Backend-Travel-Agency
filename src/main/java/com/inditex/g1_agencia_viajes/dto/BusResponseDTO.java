@@ -11,5 +11,5 @@ public class BusResponseDTO {
     private Integer capacity;
     private Integer year;
     private Boolean available;
-    private ConductorResumenDTO conductor; // objeto resumido
+    private DriverSummaryDTO driver;
 }
