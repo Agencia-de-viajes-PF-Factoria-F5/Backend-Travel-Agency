@@ -25,4 +25,8 @@ public class Bus {
 
     @Column(nullable = false)
     private Boolean available = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conductor_id")
+    private Conductor conductor;
 }
