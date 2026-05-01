@@ -1,0 +1,37 @@
+package com.inditex.g1_agencia_viajes.dto;
+
+import com.inditex.g1_agencia_viajes.model.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class UserRequestDTO {
+
+    @NotBlank(message = "El nombre es obligatorio")
+    private String name;
+
+    @NotBlank(message = "El apellido es obligatorio")
+    private String surname;
+
+    @Email(message = "El email no es válido")
+    @NotBlank(message = "El email es obligatorio")
+    private String email;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    private String password;
+
+    private String dni;
+
+    private String passport;
+
+    @Min(value = 0, message = "La edad no puede ser negativa")
+    private Integer age;
+
+    private Long tutorId;
+
+    private Boolean active;
+
+    private User.Role rol;
+}
