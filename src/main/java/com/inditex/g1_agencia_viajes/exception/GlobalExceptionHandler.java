@@ -36,6 +36,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HotelNotAvailableException.class)
     public ResponseEntity<Map<String, String>> handleHotelNotAvailable(
             HotelNotAvailableException ex) {
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists(
+            EmailAlreadyExistsException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

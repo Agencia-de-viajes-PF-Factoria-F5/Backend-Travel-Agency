@@ -1,0 +1,47 @@
+package com.inditex.g1_agencia_viajes.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "El nombre es obligatorio")
+    private String name;
+
+    @NotBlank(message = "El apellido es obligatorio")
+    private String surname;
+
+    @Email(message = "El email no es válido")
+    @NotBlank(message = "El email es obligatorio")
+    @Column(unique = true)
+    private String email;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    private String password;
+
+    private String dni;
+
+    private String passport;
+
+    private Integer age;
+
+    private Long tutorId;
+
+    private Boolean active = true;
+
+    @Enumerated(EnumType.STRING)
+    private Role rol;
+
+    public enum Role {
+        ADMIN, USER
+    }
+}
