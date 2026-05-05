@@ -18,9 +18,6 @@ public class Booking {
     @Column(name = "booking_id")
     private Long bookingId;
 
-    @Column(name = "customers_id")
-    private Long customersId;
-
     @Column(name = "bought_data")
     private LocalDateTime boughtDate;
 
@@ -36,4 +33,12 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travels_id")
     private Travel travel;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "customers_bookings", // Nombre de la tabla intermedia en la BD
+            joinColumns = @JoinColumn(name = "booking_id"), // FK de esta entidad (Booking)
+            inverseJoinColumns = @JoinColumn(name = "costumer_id") // FK de la otra entidad (User)
+    )
+    private List<User> customers;
 }
