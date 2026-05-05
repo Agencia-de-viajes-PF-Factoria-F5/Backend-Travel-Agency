@@ -30,12 +30,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    // RuntimeException temporarily commented out to avoid blocking Swagger
-    // @ExceptionHandler(RuntimeException.class)
-    // public ResponseEntity<Map<String, String>> handleRuntime(
-    //         RuntimeException ex) {
-    //     Map<String, String> error = new HashMap<>();
-    //     error.put("error", ex.getMessage());
-    //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    // }
+    @ExceptionHandler(DriverOccupiedException.class)
+    public ResponseEntity<Map<String, String>> handleDriverOccupied(
+            DriverOccupiedException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
 }

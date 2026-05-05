@@ -1,6 +1,7 @@
 package com.inditex.g1_agencia_viajes.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -12,12 +13,15 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "El teléfono es obligatorio")
     @Column(nullable = false)
     private String phone;
 
+    @NotBlank(message = "La licencia es obligatoria")
     @Column(nullable = false, unique = true)
     private String enrollment;
 
