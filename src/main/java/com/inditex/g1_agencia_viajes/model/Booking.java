@@ -1,11 +1,14 @@
 package com.inditex.g1_agencia_viajes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "bookings")
@@ -36,9 +39,14 @@ public class Booking {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "customers_bookings", // Nombre de la tabla intermedia en la BD
-            joinColumns = @JoinColumn(name = "booking_id"), // FK de esta entidad (Booking)
-            inverseJoinColumns = @JoinColumn(name = "costumer_id") // FK de la otra entidad (User)
+            name = "customers_bookings",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
     )
-    private List<User> customers;
+    private List<User> customers = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    @JsonIgnoreProperties("bookings")
+    private Employee employee;
 }

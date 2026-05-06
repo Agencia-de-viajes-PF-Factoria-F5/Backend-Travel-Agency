@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "users")
@@ -38,10 +40,6 @@ public class User {
 
     private Boolean active = true;
 
-    @Enumerated(EnumType.STRING)
-    private Role rol;
-
-    public enum Role {
-        ADMIN, USER
-    }
+    @ManyToMany(mappedBy = "customers")
+    private List<Booking> bookings;
 }
