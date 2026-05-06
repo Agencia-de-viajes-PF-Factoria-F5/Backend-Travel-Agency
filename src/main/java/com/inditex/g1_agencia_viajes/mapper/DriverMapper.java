@@ -2,6 +2,7 @@ package com.inditex.g1_agencia_viajes.mapper;
 
 import com.inditex.g1_agencia_viajes.dto.DriverRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.DriverResponseDTO;
+import com.inditex.g1_agencia_viajes.dto.DriverSummaryDTO;
 import com.inditex.g1_agencia_viajes.model.Driver;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,20 @@ public class DriverMapper {
         dto.setEnrollment(driver.getEnrollment());
         dto.setLicenceActive(driver.getLicenceActive());
         dto.setImageUrl(driver.getImageUrl());
+        return dto;
+    }
+
+    public DriverSummaryDTO toSummaryDTO(Driver driver) {
+        if (driver == null) {
+            return null;
+        }
+
+        DriverSummaryDTO dto = new DriverSummaryDTO();
+        dto.setId(driver.getId());
+        dto.setName(driver.getName());
+        dto.setPhone(driver.getPhone());
+        dto.setEnrollment(driver.getEnrollment());
+        dto.setLicenceActive(driver.getLicenceActive());
         return dto;
     }
 }
