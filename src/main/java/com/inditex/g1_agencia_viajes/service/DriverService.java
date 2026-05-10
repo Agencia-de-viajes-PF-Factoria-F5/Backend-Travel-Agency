@@ -2,7 +2,7 @@ package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.dto.DriverRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.DriverResponseDTO;
-import com.inditex.g1_agencia_viajes.exception.DriverNotFoundException;
+import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.mapper.DriverMapper;
 import com.inditex.g1_agencia_viajes.model.Driver;
 import com.inditex.g1_agencia_viajes.repository.DriverRepository;
@@ -36,7 +36,7 @@ public class DriverService {
 
     public DriverResponseDTO getById(Long id) {
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new DriverNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con id: " + id));
         return driverMapper.toDTO(driver);
     }
 
@@ -49,7 +49,7 @@ public class DriverService {
 
     public DriverResponseDTO update(Long id, DriverRequestDTO dto) {
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new DriverNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con id: " + id));
         if (dto.getName() != null)         driver.setName(dto.getName());
         if (dto.getPhone() != null)        driver.setPhone(dto.getPhone());
         if (dto.getEnrollment() != null)   driver.setEnrollment(dto.getEnrollment());
@@ -60,7 +60,7 @@ public class DriverService {
 
     public void delete(Long id) {
         if (!driverRepository.existsById(id)) {
-            throw new DriverNotFoundException(id);
+            throw new ResourceNotFoundException("Conductor no encontrado con id: " + id);
         }
         driverRepository.deleteById(id);
     }

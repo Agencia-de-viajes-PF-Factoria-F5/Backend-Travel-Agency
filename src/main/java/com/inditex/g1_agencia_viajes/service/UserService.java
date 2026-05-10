@@ -3,7 +3,7 @@ package com.inditex.g1_agencia_viajes.service;
 import com.inditex.g1_agencia_viajes.dto.UserRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.UserResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.EmailAlreadyExistsException;
-import com.inditex.g1_agencia_viajes.exception.UserNotFoundException;
+import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.mapper.UserMapper;
 import com.inditex.g1_agencia_viajes.model.User;
 import com.inditex.g1_agencia_viajes.repository.UserRepository;
@@ -40,7 +40,7 @@ public class UserService {
 
     public UserResponseDTO getById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
         return userMapper.toDTO(user);
     }
 
@@ -53,7 +53,7 @@ public class UserService {
 
     public UserResponseDTO update(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
         if (dto.getName() != null)     user.setName(dto.getName());
         if (dto.getSurname() != null)  user.setSurname(dto.getSurname());
         if (dto.getEmail() != null)    user.setEmail(dto.getEmail());
@@ -68,7 +68,7 @@ public class UserService {
 
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+            throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);
         }
         userRepository.deleteById(id);
     }
