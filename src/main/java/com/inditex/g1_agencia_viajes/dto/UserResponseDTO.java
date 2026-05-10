@@ -2,7 +2,6 @@ package com.inditex.g1_agencia_viajes.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.inditex.g1_agencia_viajes.model.User;
 import lombok.Data;
 
 @Getter
@@ -23,5 +22,4 @@ public class UserResponseDTO {
     private Integer age;
     private Long tutorId;
     private Boolean active;
-    private User.Role rol;
 }

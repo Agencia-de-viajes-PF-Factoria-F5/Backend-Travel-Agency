@@ -18,7 +18,6 @@ public class UserMapper {
         user.setPassport(dto.getPassport());
         user.setAge(dto.getAge());
         user.setTutorId(dto.getTutorId());
-        user.setRol(dto.getRol());
         if (dto.getActive() != null) {
             user.setActive(dto.getActive());
         }
@@ -36,7 +35,6 @@ public class UserMapper {
         dto.setAge(user.getAge());
         dto.setTutorId(user.getTutorId());
         dto.setActive(user.getActive());
-        dto.setRol(user.getRol());
         return dto;
     }
 }

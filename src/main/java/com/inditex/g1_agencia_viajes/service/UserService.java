@@ -63,7 +63,6 @@ public class UserService {
         if (dto.getAge() != null)      user.setAge(dto.getAge());
         if (dto.getTutorId() != null)  user.setTutorId(dto.getTutorId());
         if (dto.getActive() != null)   user.setActive(dto.getActive());
-        if (dto.getRol() != null)      user.setRol(dto.getRol());
         return userMapper.toDTO(userRepository.save(user));
     }
 

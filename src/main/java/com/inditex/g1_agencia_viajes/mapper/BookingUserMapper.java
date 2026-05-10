@@ -1,19 +1,20 @@
 package com.inditex.g1_agencia_viajes.mapper;
 
 import com.inditex.g1_agencia_viajes.dto.UserResponseDTO;
+import com.inditex.g1_agencia_viajes.model.User;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class BookingCustomerMapper {
+public class BookingUserMapper {
 
     // Convierte un Usuario a su DTO de respuesta
     public UserResponseDTO toUserResponseDTO(User user) {
         if (user == null) return null;
 
         UserResponseDTO dto = new UserResponseDTO();
-        dto.setUserId(user.getUsersId());
+        dto.setUserId(user.getId());
         dto.setFullName(user.getName() + " " + user.getSurname());
         dto.setEmail(user.getEmail());
         dto.setDni(user.getDni());

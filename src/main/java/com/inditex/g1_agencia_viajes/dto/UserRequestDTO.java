@@ -1,6 +1,5 @@
 package com.inditex.g1_agencia_viajes.dto;
 
-import com.inditex.g1_agencia_viajes.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -32,6 +31,4 @@ public class UserRequestDTO {
     private Long tutorId;
 
     private Boolean active;
-
-    private User.Role rol;
 }
