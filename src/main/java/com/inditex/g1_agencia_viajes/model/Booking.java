@@ -21,14 +21,15 @@ public class Booking {
     @Column(name = "booking_id")
     private Long bookingId;
 
-    @Column(name = "bought_data")
+    @Column(name = "bought_date")
     private LocalDateTime boughtDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_board")
     private TypeBoard typeBoard;
 
-    private Boolean group;
+    @Column(name = "is_group")
+    private Boolean isGroup;
 
     @Column(name = "total_price")
     private Double totalPrice;

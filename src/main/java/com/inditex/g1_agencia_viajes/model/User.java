@@ -27,16 +27,15 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    private String password;
-
     private String dni;
 
     private String passport;
 
     private Integer age;
 
-    private Long tutorId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tutor_id", referencedColumnName = "id")
+    private User tutorId;
 
     private Boolean active = true;
 

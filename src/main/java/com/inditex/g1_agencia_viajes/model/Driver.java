@@ -21,9 +21,9 @@ public class Driver {
     @Column(nullable = false)
     private String phone;
 
-    @NotBlank(message = "La licencia es obligatoria")
+    /*@NotBlank(message = "La licencia es obligatoria")
     @Column(nullable = false, unique = true)
-    private String enrollment;
+    private String enrollment; */
 
     @Column(nullable = false)
     private Boolean licenceActive = true;

@@ -13,7 +13,7 @@ public class DriverMapper {
         Driver driver = new Driver();
         driver.setName(dto.getName());
         driver.setPhone(dto.getPhone());
-        driver.setEnrollment(dto.getEnrollment());
+        /*driver.setEnrollment(dto.getEnrollment());*/
         driver.setImageUrl(dto.getImageUrl());
         if (dto.getLicenceActive() != null) {
             driver.setLicenceActive(dto.getLicenceActive());
@@ -26,7 +26,7 @@ public class DriverMapper {
         dto.setId(driver.getId());
         dto.setName(driver.getName());
         dto.setPhone(driver.getPhone());
-        dto.setEnrollment(driver.getEnrollment());
+        /*dto.setEnrollment(driver.getEnrollment()); */
         dto.setLicenceActive(driver.getLicenceActive());
         dto.setImageUrl(driver.getImageUrl());
         return dto;
@@ -41,7 +41,7 @@ public class DriverMapper {
         dto.setId(driver.getId());
         dto.setName(driver.getName());
         dto.setPhone(driver.getPhone());
-        dto.setEnrollment(driver.getEnrollment());
+        /*dto.setEnrollment(driver.getEnrollment()); */
         dto.setLicenceActive(driver.getLicenceActive());
         return dto;
     }

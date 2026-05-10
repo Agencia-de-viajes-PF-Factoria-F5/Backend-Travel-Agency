@@ -50,9 +50,7 @@ public class BusServiceImpl implements BusService {
         Bus bus = busRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
         bus.setLicensePlate(dto.getLicensePlate());
-        bus.setBrand(dto.getBrand());
         bus.setCapacity(dto.getCapacity());
-        bus.setYear(dto.getYear());
         bus.setDriver(resolveDriver(dto.getDriverId()));
         return toResponseDTO(busRepository.save(bus));
     }
@@ -70,10 +68,8 @@ public class BusServiceImpl implements BusService {
         BusResponseDTO dto = new BusResponseDTO();
         dto.setId(bus.getId());
         dto.setLicensePlate(bus.getLicensePlate());
-        dto.setBrand(bus.getBrand());
         dto.setCapacity(bus.getCapacity());
-        dto.setYear(bus.getYear());
-        dto.setAvailable(bus.getAvailable());
+        /*dto.setAvailable(bus.getAvailable());*/
         dto.setDriver(driverMapper.toSummaryDTO(bus.getDriver()));
         return dto;
     }
@@ -81,9 +77,7 @@ public class BusServiceImpl implements BusService {
     private Bus toEntity(BusRequestDTO dto) {
         Bus bus = new Bus();
         bus.setLicensePlate(dto.getLicensePlate());
-        bus.setBrand(dto.getBrand());
         bus.setCapacity(dto.getCapacity());
-        bus.setYear(dto.getYear());
         bus.setDriver(resolveDriver(dto.getDriverId()));
         return bus;
     }

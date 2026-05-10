@@ -35,7 +35,7 @@ public class BookingService {
             booking.setCustomers(bookingDetails.getCustomers());
             booking.setBoughtDate(bookingDetails.getBoughtDate());
             booking.setTypeBoard(bookingDetails.getTypeBoard());
-            booking.setGroup(bookingDetails.getGroup());
+            booking.setIsGroup(bookingDetails.getIsGroup());
             booking.setTotalPrice(bookingDetails.getTotalPrice());
             booking.setTravel(bookingDetails.getTravel());
             booking.setEmployee(bookingDetails.getEmployee());

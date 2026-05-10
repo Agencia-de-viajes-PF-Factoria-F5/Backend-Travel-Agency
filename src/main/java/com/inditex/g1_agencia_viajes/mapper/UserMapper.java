@@ -13,11 +13,9 @@ public class UserMapper {
         user.setName(dto.getName());
         user.setSurname(dto.getSurname());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
         user.setDni(dto.getDni());
         user.setPassport(dto.getPassport());
         user.setAge(dto.getAge());
-        user.setTutorId(dto.getTutorId());
         if (dto.getActive() != null) {
             user.setActive(dto.getActive());
         }
@@ -33,8 +31,10 @@ public class UserMapper {
         dto.setDni(user.getDni());
         dto.setPassport(user.getPassport());
         dto.setAge(user.getAge());
-        dto.setTutorId(user.getTutorId());
         dto.setActive(user.getActive());
+        if (user.getTutorId() != null) {
+            dto.setTutorId(user.getTutorId().getId());
+        }
         return dto;
     }
 }

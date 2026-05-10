@@ -16,15 +16,15 @@ public class Bus {
     private String licensePlate;
 
     @Column(nullable = false)
-    private String brand;
-
-    @Column(nullable = false)
     private Integer capacity;
 
-    private Integer year;
+    /* @Column(nullable = false)
+    private Boolean available = true; */
 
-    @Column(nullable = false)
-    private Boolean available = true;
+    private Boolean bath;
+    private Boolean wifi;
+    private Boolean AC;
+    private Boolean USB;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")

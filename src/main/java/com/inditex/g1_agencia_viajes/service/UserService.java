@@ -27,7 +27,15 @@ public class UserService {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException(dto.getEmail());
         }
+
         User user = userMapper.toEntity(dto);
+
+        if (dto.getTutorId() != null) {
+            User tutor = userRepository.findById(dto.getTutorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Tutor no encontrado"));
+            user.setTutorId(tutor);
+        }
+
         return userMapper.toDTO(userRepository.save(user));
     }
 
@@ -57,11 +65,14 @@ public class UserService {
         if (dto.getName() != null)     user.setName(dto.getName());
         if (dto.getSurname() != null)  user.setSurname(dto.getSurname());
         if (dto.getEmail() != null)    user.setEmail(dto.getEmail());
-        if (dto.getPassword() != null) user.setPassword(dto.getPassword());
         if (dto.getDni() != null)      user.setDni(dto.getDni());
         if (dto.getPassport() != null) user.setPassport(dto.getPassport());
         if (dto.getAge() != null)      user.setAge(dto.getAge());
-        if (dto.getTutorId() != null)  user.setTutorId(dto.getTutorId());
+        if (dto.getTutorId() != null){
+            User tutor = userRepository.findById(dto.getTutorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Tutor no encontrado con id: " + dto.getTutorId()));
+            user.setTutorId(tutor);
+        }
         if (dto.getActive() != null)   user.setActive(dto.getActive());
         return userMapper.toDTO(userRepository.save(user));
     }

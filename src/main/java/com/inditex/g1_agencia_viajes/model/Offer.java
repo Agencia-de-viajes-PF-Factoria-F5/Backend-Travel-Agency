@@ -27,7 +27,7 @@ public class Offer {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "star_date")
+    @Column(name = "start_date")
     private LocalDate startDate;
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)

@@ -52,7 +52,7 @@ public class DriverService {
                 .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con id: " + id));
         if (dto.getName() != null)         driver.setName(dto.getName());
         if (dto.getPhone() != null)        driver.setPhone(dto.getPhone());
-        if (dto.getEnrollment() != null)   driver.setEnrollment(dto.getEnrollment());
+        /*if (dto.getEnrollment() != null)   driver.setEnrollment(dto.getEnrollment());^*/
         if (dto.getImageUrl() != null)     driver.setImageUrl(dto.getImageUrl());
         if (dto.getLicenceActive() != null) driver.setLicenceActive(dto.getLicenceActive());
         return driverMapper.toDTO(driverRepository.save(driver));
