@@ -9,6 +9,7 @@ import com.inditex.g1_agencia_viajes.repository.HotelRepository;
 import com.inditex.g1_agencia_viajes.repository.TravelRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,23 @@ public class TravelService {
     public List<TravelResponseDTO> getAll() {
         return travelRepository.findAll()
                 .stream()
+                .map(travelMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<TravelResponseDTO> getAvailable() {
+        return travelRepository.findAll()
+                .stream()
+                .filter(t -> t.getAvailablePlaces() != null && t.getAvailablePlaces() > 0)
+                .filter(t -> t.getStartDate().isAfter(LocalDate.now()))
+                .map(travelMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<TravelResponseDTO> getOnSale() {
+        return travelRepository.findAll()
+                .stream()
+                .filter(t -> Boolean.TRUE.equals(t.getSale()))
                 .map(travelMapper::toDTO)
                 .collect(Collectors.toList());
     }
