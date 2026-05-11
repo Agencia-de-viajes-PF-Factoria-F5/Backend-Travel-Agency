@@ -2,6 +2,7 @@ package com.inditex.g1_agencia_viajes.controller;
 
 import com.inditex.g1_agencia_viajes.model.Booking;
 import com.inditex.g1_agencia_viajes.service.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,11 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    // GET: /api/bookings
     @GetMapping
     public List<Booking> getAllBookings() {
         return bookingService.findAll();
     }
 
-    // GET: /api/bookings/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
         return bookingService.findById(id)
@@ -28,15 +27,13 @@ public class BookingController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST: /api/bookings
     @PostMapping
-    public Booking createBooking(@RequestBody Booking booking) {
+    public Booking createBooking(@Valid @RequestBody Booking booking) {
         return bookingService.save(booking);
     }
 
-    // PUT: /api/bookings/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @RequestBody Booking bookingDetails) {
+    public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @Valid @RequestBody Booking bookingDetails) {
         try {
             Booking updatedBooking = bookingService.update(id, bookingDetails);
             return ResponseEntity.ok(updatedBooking);
@@ -45,7 +42,6 @@ public class BookingController {
         }
     }
 
-    // DELETE: /api/bookings/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
         try {

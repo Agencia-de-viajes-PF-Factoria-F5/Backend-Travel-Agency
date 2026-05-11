@@ -27,6 +27,7 @@ public class Travel {
     private LocalDate endDate;
 
     private Boolean sale = false;
+    private Boolean active = true;
 
     @Min(value = 0, message = "Las plazas no pueden ser negativas")
     private Integer availablePlaces;
