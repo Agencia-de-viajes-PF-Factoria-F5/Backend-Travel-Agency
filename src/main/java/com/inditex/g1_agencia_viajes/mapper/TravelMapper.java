@@ -16,6 +16,7 @@ public class TravelMapper {
         travel.setEndDate(dto.getEndDate());
         travel.setSale(dto.getSale());
         travel.setAvailablePlaces(dto.getAvailablePlaces());
+        travel.setTags(dto.getTags());
         travel.setHotel(hotel);
         return travel;
     }
@@ -28,6 +29,7 @@ public class TravelMapper {
         dto.setEndDate(travel.getEndDate());
         dto.setSale(travel.getSale());
         dto.setAvailablePlaces(travel.getAvailablePlaces());
+        dto.setTags(travel.getTags());
         dto.setActive(travel.getActive());
         dto.setHotelId(travel.getHotel().getId());
         dto.setHotelName(travel.getHotel().getName());

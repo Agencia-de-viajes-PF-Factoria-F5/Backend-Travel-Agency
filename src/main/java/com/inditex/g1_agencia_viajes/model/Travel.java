@@ -28,8 +28,12 @@ public class Travel {
 
     private Boolean sale = false;
 
+    private Boolean active= true;
+
     @Min(value = 0, message = "Las plazas no pueden ser negativas")
     private Integer availablePlaces;
+
+    private String tags;
 
     @ManyToOne
     @JoinColumn(name = "hotel_id")
@@ -42,6 +46,6 @@ public class Travel {
     private List<Booking> bookings;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "offer_id") // Crea físicamente la columna FK "offer_id" en la tabla travels
+    @JoinColumn(name = "offer_id")
     private Offer offer;
 }

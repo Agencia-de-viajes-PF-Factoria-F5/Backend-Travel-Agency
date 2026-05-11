@@ -73,6 +73,7 @@ public class TravelService {
         if (dto.getEndDate() != null)         travel.setEndDate(dto.getEndDate());
         if (dto.getSale() != null)            travel.setSale(dto.getSale());
         if (dto.getAvailablePlaces() != null) travel.setAvailablePlaces(dto.getAvailablePlaces());
+        if (dto.getTags() != null)            travel.setTags(dto.getTags());
         travel.setHotel(hotel);
         return travelMapper.toDTO(travelRepository.save(travel));
     }

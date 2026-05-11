@@ -27,6 +27,8 @@ public class TravelRequestDTO {
     @Min(value = 1, message = "Debe haber al menos una plaza")
     private Integer availablePlaces;
 
+    private String tags;
+
     @NotNull(message = "El hotel es obligatorio")
     private Long hotelId;
 }

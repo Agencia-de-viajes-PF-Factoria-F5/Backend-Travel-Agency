@@ -12,6 +12,7 @@ public class TravelResponseDTO {
     private LocalDate endDate;
     private Boolean sale;
     private Integer availablePlaces;
+    private String tags;
     private Boolean active;
 
 
