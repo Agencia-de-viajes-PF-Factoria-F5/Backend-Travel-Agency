@@ -23,7 +23,7 @@ public class TripSegmentService {
     @Transactional(readOnly = true)
     public TripSegment getById(Long id) {
         return tripSegmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Trip segment not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l trayecto", id));
     }
 
     @Transactional
@@ -49,7 +49,7 @@ public class TripSegmentService {
     @Transactional
     public void delete(Long id) {
         if (!tripSegmentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Trip segment not found with id: " + id);
+            throw new ResourceNotFoundException("l trayecto", id);
         }
         tripSegmentRepository.deleteById(id);
     }

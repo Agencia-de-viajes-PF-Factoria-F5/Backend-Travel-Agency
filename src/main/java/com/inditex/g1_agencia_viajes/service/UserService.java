@@ -32,7 +32,7 @@ public class UserService {
         User user = userMapper.toEntity(dto);
         if (dto.getTutorId() != null) {
             User tutor = userRepository.findById(dto.getTutorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Tutor no encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("l tutor", dto.getTutorId()));
             user.setTutorId(tutor);
         }
         return userMapper.toDTO(userRepository.save(user));
@@ -49,7 +49,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDTO getById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l cliente", id));
         return userMapper.toDTO(user);
     }
 
@@ -64,7 +64,7 @@ public class UserService {
     @Transactional
     public UserResponseDTO update(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l cliente", id));
         if (dto.getName() != null)     user.setName(dto.getName());
         if (dto.getSurname() != null)  user.setSurname(dto.getSurname());
         if (dto.getEmail() != null)    user.setEmail(dto.getEmail());
@@ -73,7 +73,7 @@ public class UserService {
         if (dto.getAge() != null)      user.setAge(dto.getAge());
         if (dto.getTutorId() != null) {
             User tutor = userRepository.findById(dto.getTutorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Tutor no encontrado con id: " + dto.getTutorId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("l tutor", dto.getTutorId()));
             user.setTutorId(tutor);
         }
         if (dto.getActive() != null)   user.setActive(dto.getActive());
@@ -83,7 +83,7 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);
+            throw new ResourceNotFoundException("l cliente", id);
         }
         userRepository.deleteById(id);
     }

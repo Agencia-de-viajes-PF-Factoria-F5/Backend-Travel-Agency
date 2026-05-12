@@ -35,7 +35,7 @@ public class BookingPricingService {
     @Transactional(readOnly = true)
     public BookingQuoteResponseDTO quote(BookingQuoteRequestDTO request) {
         Travel travel = travelRepository.findById(request.getTravelId())
-                .orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado con id: " + request.getTravelId()));
+                .orElseThrow(() -> new ResourceNotFoundException("l viaje", + request.getTravelId()));
         List<User> customers = loadUsers(request.getCustomerIds());
         return buildQuote(travel, request.getTypeBoard(), customers, request.getIsGroup());
     }
@@ -43,7 +43,7 @@ public class BookingPricingService {
     @Transactional(readOnly = true)
     public Double calculateTotalPrice(Booking booking) {
         if (booking.getTravel() == null || booking.getTravel().getId() == null) {
-            throw new ResourceNotFoundException("El viaje de la reserva es obligatorio");
+            throw new ResourceNotFoundException("l viaje", + booking.getTravel().getId());
         }
         if (booking.getTypeBoard() == null) {
             throw new IllegalArgumentException("El tipo de pensión es obligatorio");
@@ -52,7 +52,7 @@ public class BookingPricingService {
             throw new IllegalArgumentException("Debes indicar al menos un cliente");
         }
         Travel travel = travelRepository.findById(booking.getTravel().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado con id: " + booking.getTravel().getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("l viaje", booking.getTravel().getId()));
         BookingQuoteResponseDTO quote = buildQuote(travel, booking.getTypeBoard(), booking.getCustomers(), booking.getIsGroup());
         return quote.getTotalPrice();
     }
@@ -65,7 +65,7 @@ public class BookingPricingService {
 
         for (Long customerId : customerIds) {
             User user = userRepository.findById(customerId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + customerId));
+                    .orElseThrow(() -> new ResourceNotFoundException("l cliente", customerId));
             users.add(user);
         }
         return users;
@@ -80,7 +80,7 @@ public class BookingPricingService {
         }
         Hotel hotel = travel.getHotel();
         if (hotel == null) {
-            throw new ResourceNotFoundException("El viaje no tiene hotel asociado");
+            throw new ResourceNotFoundException("l hotel", travel.getId());
         }
 
         BigDecimal basePricePerPassenger = resolveBasePrice(hotel, typeBoard);
@@ -121,7 +121,7 @@ public class BookingPricingService {
     private BigDecimal resolveBasePrice(Hotel hotel, TypeBoard typeBoard) {
         Double price = typeBoard == TypeBoard.FULL ? hotel.getFullBoardPrice() : hotel.getHalfBoardPrice();
         if (price == null) {
-            throw new ResourceNotFoundException("El hotel no tiene precio configurado para el tipo de pensión seleccionado");
+            throw new ResourceNotFoundException("l hotel", hotel.getId());
         }
         return BigDecimal.valueOf(price);
     }

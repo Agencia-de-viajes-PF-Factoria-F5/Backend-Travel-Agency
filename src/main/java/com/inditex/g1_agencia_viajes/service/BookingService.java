@@ -57,13 +57,13 @@ public class BookingService {
             booking.setEmployee(bookingDetails.getEmployee());
             booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
             return bookingRepository.save(booking);
-        }).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada con el id: " + id));
+        }).orElseThrow(() -> new ResourceNotFoundException(" la reserva", id));
     }
 
     @Transactional
     public void deleteById(Long id) {
         if (!bookingRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Reserva no encontrada con el id: " + id);
+            throw new ResourceNotFoundException(" la reserva", id);
         }
         bookingRepository.deleteById(id);
     }
@@ -71,9 +71,9 @@ public class BookingService {
     @Transactional
     public void addCustomerToBooking(BookingUserRequestDTO request) {
         Booking booking = bookingRepository.findById(request.getBookingId())
-                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException(" la reserva", request.getBookingId()));
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("l usuario", request.getUserId()));
         validateMinorHasTutor(user);
         booking.getCustomers().add(user);
         booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
@@ -116,7 +116,7 @@ public class BookingService {
             }
 
             User resolvedCustomer = userRepository.findById(customer.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + customer.getId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("l cliente", customer.getId()));
             resolvedCustomers.add(resolvedCustomer);
         }
         return resolvedCustomers;
