@@ -41,7 +41,7 @@ public class HotelService {
     @Transactional(readOnly = true)
     public HotelResponseDTO getById(Long id) {
         Hotel hotel = hotelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l hotel", id));
         return hotelMapper.toDTO(hotel);
     }
 
@@ -64,7 +64,7 @@ public class HotelService {
     @Transactional
     public HotelResponseDTO update(Long id, HotelRequestDTO dto) {
         Hotel hotel = hotelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l hotel", id));
         if (dto.getName() != null)            hotel.setName(dto.getName());
         if (dto.getAddress() != null)         hotel.setAddress(dto.getAddress());
         if (dto.getCity() != null)            hotel.setCity(dto.getCity());
@@ -82,7 +82,7 @@ public class HotelService {
     @Transactional
     public void delete(Long id) {
         if (!hotelRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Hotel no encontrado con id: " + id);
+            throw new ResourceNotFoundException("l hotel", id);
         }
         hotelRepository.deleteById(id);
     }
@@ -90,7 +90,7 @@ public class HotelService {
     @Transactional
     public void reducirPlazas(Long id, Integer plazas) {
         Hotel hotel = hotelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l hotel", id));
         if (hotel.getAvailablePlaces() < plazas) {
             throw new HotelNotAvailableException(id);
         }
@@ -101,7 +101,7 @@ public class HotelService {
     @Transactional
     public void liberarPlazas(Long id, Integer plazas) {
         Hotel hotel = hotelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l hotel", id));
         hotel.setAvailablePlaces(hotel.getAvailablePlaces() + plazas);
         hotelRepository.save(hotel);
     }

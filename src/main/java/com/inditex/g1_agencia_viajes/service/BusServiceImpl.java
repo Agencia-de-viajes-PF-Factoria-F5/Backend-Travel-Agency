@@ -36,7 +36,7 @@ public class BusServiceImpl implements BusService {
     @Transactional(readOnly = true)
     public BusResponseDTO getById(Long id) {
         Bus bus = busRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l bus", id));
         return toResponseDTO(bus);
     }
 
@@ -44,7 +44,7 @@ public class BusServiceImpl implements BusService {
     @Transactional
     public BusResponseDTO create(BusRequestDTO dto) {
         if (busRepository.existsByLicensePlate(dto.getLicensePlate())) {
-            throw new RuntimeException("A bus with this license plate already exists: " + dto.getLicensePlate());
+            throw new RuntimeException("Ya existe un autobús con el número de placa: " + dto.getLicensePlate());
         }
         return toResponseDTO(busRepository.save(toEntity(dto)));
     }
@@ -53,7 +53,7 @@ public class BusServiceImpl implements BusService {
     @Transactional
     public BusResponseDTO update(Long id, BusRequestDTO dto) {
         Bus bus = busRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("l bus", id));
         bus.setLicensePlate(dto.getLicensePlate());
         bus.setCapacity(dto.getCapacity());
         bus.setDriver(resolveDriver(dto.getDriverId()));
@@ -64,7 +64,7 @@ public class BusServiceImpl implements BusService {
     @Transactional
     public void delete(Long id) {
         if (!busRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Bus not found with id: " + id);
+            throw new ResourceNotFoundException("l bus", id);
         }
         busRepository.deleteById(id);
     }
@@ -89,6 +89,6 @@ public class BusServiceImpl implements BusService {
     private Driver resolveDriver(Long driverId) {
         if (driverId == null) return null;
         return driverRepository.findById(driverId)
-                .orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: " + driverId));
+                .orElseThrow(() -> new ResourceNotFoundException("l conductor", driverId));
     }
 }
