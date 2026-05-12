@@ -1,6 +1,8 @@
 package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.dto.BookingUserRequestDTO;
+import com.inditex.g1_agencia_viajes.exception.MinorWithoutTutorException;
+import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.model.Booking;
 import com.inditex.g1_agencia_viajes.model.User;
 import com.inditex.g1_agencia_viajes.repository.BookingRepository;
@@ -31,12 +33,14 @@ public class BookingService {
 
     @Transactional
     public Booking save(Booking booking) {
+        validateCustomersForBooking(booking.getCustomers());
         return bookingRepository.save(booking);
     }
 
     @Transactional
     public Booking update(Long id, Booking bookingDetails) {
         return bookingRepository.findById(id).map(booking -> {
+            validateCustomersForBooking(bookingDetails.getCustomers());
             booking.setCustomers(bookingDetails.getCustomers());
             booking.setBoughtDate(bookingDetails.getBoughtDate());
             booking.setTypeBoard(bookingDetails.getTypeBoard());
@@ -45,13 +49,13 @@ public class BookingService {
             booking.setTravel(bookingDetails.getTravel());
             booking.setEmployee(bookingDetails.getEmployee());
             return bookingRepository.save(booking);
-        }).orElseThrow(() -> new RuntimeException("Reserva no encontrada con el id: " + id));
+        }).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada con el id: " + id));
     }
 
     @Transactional
     public void deleteById(Long id) {
         if (!bookingRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. Reserva no encontrada con el id: " + id);
+            throw new ResourceNotFoundException("Reserva no encontrada con el id: " + id);
         }
         bookingRepository.deleteById(id);
     }
@@ -59,10 +63,30 @@ public class BookingService {
     @Transactional
     public void addCustomerToBooking(BookingUserRequestDTO request) {
         Booking booking = bookingRepository.findById(request.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        validateMinorHasTutor(user);
         booking.getCustomers().add(user);
         bookingRepository.save(booking);
+    }
+
+    private void validateCustomersForBooking(List<User> customers) {
+        if (customers == null) {
+            return;
+        }
+
+        for (User customer : customers) {
+            validateMinorHasTutor(customer);
+        }
+    }
+
+    private void validateMinorHasTutor(User user) {
+        if (user != null
+                && user.getAge() != null
+                && user.getAge() < 18
+                && user.getTutorId() == null) {
+            throw new MinorWithoutTutorException();
+        }
     }
 }
