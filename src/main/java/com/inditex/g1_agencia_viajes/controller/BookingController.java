@@ -3,7 +3,7 @@ package com.inditex.g1_agencia_viajes.controller;
 import com.inditex.g1_agencia_viajes.model.Booking;
 import com.inditex.g1_agencia_viajes.service.BookingService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,12 +12,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bookings")
 public class BookingController {
-    @Autowired
-    private BookingService bookingService;
+
+    private final BookingService bookingService;
+
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
 
     @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingService.findAll();
+    public ResponseEntity<List<Booking>> getAllBookings() {
+        return ResponseEntity.ok(bookingService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -28,15 +32,14 @@ public class BookingController {
     }
 
     @PostMapping
-    public Booking createBooking(@Valid @RequestBody Booking booking) {
-        return bookingService.save(booking);
+    public ResponseEntity<Booking> createBooking(@Valid @RequestBody Booking booking) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.save(booking));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @Valid @RequestBody Booking bookingDetails) {
         try {
-            Booking updatedBooking = bookingService.update(id, bookingDetails);
-            return ResponseEntity.ok(updatedBooking);
+            return ResponseEntity.ok(bookingService.update(id, bookingDetails));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
