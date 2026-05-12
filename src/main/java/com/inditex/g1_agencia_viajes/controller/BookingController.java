@@ -1,5 +1,7 @@
 package com.inditex.g1_agencia_viajes.controller;
 
+import com.inditex.g1_agencia_viajes.dto.BookingQuoteRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.BookingQuoteResponseDTO;
 import com.inditex.g1_agencia_viajes.model.Booking;
 import com.inditex.g1_agencia_viajes.service.BookingService;
 import jakarta.validation.Valid;
@@ -30,6 +32,11 @@ public class BookingController {
     @PostMapping
     public Booking createBooking(@Valid @RequestBody Booking booking) {
         return bookingService.save(booking);
+    }
+
+    @PostMapping("/quote")
+    public ResponseEntity<BookingQuoteResponseDTO> quoteBooking(@Valid @RequestBody BookingQuoteRequestDTO request) {
+        return ResponseEntity.ok(bookingService.quote(request));
     }
 
     @PutMapping("/{id}")
