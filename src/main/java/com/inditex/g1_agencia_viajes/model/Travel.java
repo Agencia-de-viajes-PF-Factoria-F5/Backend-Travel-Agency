@@ -43,6 +43,6 @@ public class Travel {
     private List<Booking> bookings;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "offer_id") // Crea físicamente la columna FK "offer_id" en la tabla travels
+    @JoinColumn(name = "offer_id")
     private Offer offer;
 }
