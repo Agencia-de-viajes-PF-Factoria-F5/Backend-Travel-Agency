@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 @Component
 public class BookingUserMapper {
 
-    // Convierte un Usuario a su DTO de respuesta
     public UserResponseDTO toUserResponseDTO(User user) {
         if (user == null) return null;
 
