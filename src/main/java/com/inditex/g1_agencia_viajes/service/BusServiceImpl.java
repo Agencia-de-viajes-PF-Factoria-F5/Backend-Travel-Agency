@@ -56,6 +56,10 @@ public class BusServiceImpl implements BusService {
                 .orElseThrow(() -> new ResourceNotFoundException("l bus", id));
         bus.setLicensePlate(dto.getLicensePlate());
         bus.setCapacity(dto.getCapacity());
+        bus.setBath(dto.getBath());
+        bus.setWifi(dto.getWifi());
+        bus.setAC(dto.getAC());
+        bus.setUSB(dto.getUSB());
         bus.setDriver(resolveDriver(dto.getDriverId()));
         return toResponseDTO(busRepository.save(bus));
     }
@@ -74,6 +78,10 @@ public class BusServiceImpl implements BusService {
         dto.setId(bus.getId());
         dto.setLicensePlate(bus.getLicensePlate());
         dto.setCapacity(bus.getCapacity());
+        dto.setBath(bus.getBath());
+        dto.setWifi(bus.getWifi());
+        dto.setAC(bus.getAC());
+        dto.setUSB(bus.getUSB());
         dto.setDriver(driverMapper.toSummaryDTO(bus.getDriver()));
         return dto;
     }
@@ -82,6 +90,10 @@ public class BusServiceImpl implements BusService {
         Bus bus = new Bus();
         bus.setLicensePlate(dto.getLicensePlate());
         bus.setCapacity(dto.getCapacity());
+        bus.setBath(dto.getBath());
+        bus.setWifi(dto.getWifi());
+        bus.setAC(dto.getAC());
+        bus.setUSB(dto.getUSB());
         bus.setDriver(resolveDriver(dto.getDriverId()));
         return bus;
     }

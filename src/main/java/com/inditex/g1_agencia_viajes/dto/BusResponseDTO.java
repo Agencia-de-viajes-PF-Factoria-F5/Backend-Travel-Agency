@@ -7,9 +7,11 @@ public class BusResponseDTO {
 
     private Long id;
     private String licensePlate;
-    private String brand;
     private Integer capacity;
-    private Integer year;
+    private Boolean bath;
+    private Boolean wifi;
+    private Boolean AC;
+    private Boolean USB;
     private Boolean available;
     private DriverSummaryDTO driver;
 }
