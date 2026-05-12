@@ -1,5 +1,6 @@
 package com.inditex.g1_agencia_viajes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -36,12 +37,15 @@ public class Travel {
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
     private List<TripSegment> tripSegments;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
     private List<Booking> bookings;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "offer_id")
     private Offer offer;

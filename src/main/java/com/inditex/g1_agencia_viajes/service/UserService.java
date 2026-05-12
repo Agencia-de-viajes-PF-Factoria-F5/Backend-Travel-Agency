@@ -8,6 +8,7 @@ import com.inditex.g1_agencia_viajes.mapper.UserMapper;
 import com.inditex.g1_agencia_viajes.model.User;
 import com.inditex.g1_agencia_viajes.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,22 +24,21 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    @Transactional
     public UserResponseDTO create(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException(dto.getEmail());
         }
-
         User user = userMapper.toEntity(dto);
-
         if (dto.getTutorId() != null) {
             User tutor = userRepository.findById(dto.getTutorId())
                     .orElseThrow(() -> new ResourceNotFoundException("Tutor no encontrado"));
             user.setTutorId(tutor);
         }
-
         return userMapper.toDTO(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> getAll() {
         return userRepository.findAll()
                 .stream()
@@ -46,12 +46,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDTO getById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
         return userMapper.toDTO(user);
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> getActive() {
         return userRepository.findByActive(true)
                 .stream()
@@ -59,6 +61,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserResponseDTO update(Long id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
@@ -68,7 +71,7 @@ public class UserService {
         if (dto.getDni() != null)      user.setDni(dto.getDni());
         if (dto.getPassport() != null) user.setPassport(dto.getPassport());
         if (dto.getAge() != null)      user.setAge(dto.getAge());
-        if (dto.getTutorId() != null){
+        if (dto.getTutorId() != null) {
             User tutor = userRepository.findById(dto.getTutorId())
                     .orElseThrow(() -> new ResourceNotFoundException("Tutor no encontrado con id: " + dto.getTutorId()));
             user.setTutorId(tutor);
@@ -77,6 +80,7 @@ public class UserService {
         return userMapper.toDTO(userRepository.save(user));
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);

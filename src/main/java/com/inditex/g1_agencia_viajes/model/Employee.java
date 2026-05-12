@@ -1,10 +1,10 @@
 package com.inditex.g1_agencia_viajes.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 

@@ -5,6 +5,7 @@ import com.inditex.g1_agencia_viajes.model.TripSegment;
 import com.inditex.g1_agencia_viajes.repository.TripSegmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,20 +15,24 @@ public class TripSegmentService {
 
     private final TripSegmentRepository tripSegmentRepository;
 
+    @Transactional(readOnly = true)
     public List<TripSegment> getAll() {
         return tripSegmentRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public TripSegment getById(Long id) {
         return tripSegmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip segment not found with id: " + id));
     }
 
+    @Transactional
     public TripSegment create(TripSegment tripSegment) {
         validateRelations(tripSegment);
         return tripSegmentRepository.save(tripSegment);
     }
 
+    @Transactional
     public TripSegment update(Long id, TripSegment tripSegmentDetails) {
         TripSegment tripSegment = getById(id);
         tripSegment.setTravel(tripSegmentDetails.getTravel());
@@ -41,6 +46,7 @@ public class TripSegmentService {
         return tripSegmentRepository.save(tripSegment);
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!tripSegmentRepository.existsById(id)) {
             throw new ResourceNotFoundException("Trip segment not found with id: " + id);

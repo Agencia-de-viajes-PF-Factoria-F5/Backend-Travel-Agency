@@ -1,6 +1,6 @@
 package com.inditex.g1_agencia_viajes.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Booking {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
@@ -34,10 +35,12 @@ public class Booking {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travels_id")
     private Travel travel;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "customers_bookings",
@@ -46,8 +49,8 @@ public class Booking {
     )
     private List<User> customers = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
-    @JsonIgnoreProperties("bookings")
     private Employee employee;
 }

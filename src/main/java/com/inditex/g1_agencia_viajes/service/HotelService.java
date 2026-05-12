@@ -8,6 +8,7 @@ import com.inditex.g1_agencia_viajes.mapper.HotelMapper;
 import com.inditex.g1_agencia_viajes.model.Hotel;
 import com.inditex.g1_agencia_viajes.repository.HotelRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,11 +24,13 @@ public class HotelService {
         this.hotelMapper = hotelMapper;
     }
 
+    @Transactional
     public HotelResponseDTO create(HotelRequestDTO dto) {
         Hotel hotel = hotelMapper.toEntity(dto);
         return hotelMapper.toDTO(hotelRepository.save(hotel));
     }
 
+    @Transactional(readOnly = true)
     public List<HotelResponseDTO> getAll() {
         return hotelRepository.findAll()
                 .stream()
@@ -35,12 +38,14 @@ public class HotelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public HotelResponseDTO getById(Long id) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
         return hotelMapper.toDTO(hotel);
     }
 
+    @Transactional(readOnly = true)
     public List<HotelResponseDTO> getActive() {
         return hotelRepository.findByActive(true)
                 .stream()
@@ -48,6 +53,7 @@ public class HotelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<HotelResponseDTO> getAvailable() {
         return hotelRepository.findByAvailablePlacesGreaterThan(0)
                 .stream()
@@ -55,6 +61,7 @@ public class HotelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public HotelResponseDTO update(Long id, HotelRequestDTO dto) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
@@ -72,6 +79,7 @@ public class HotelService {
         return hotelMapper.toDTO(hotelRepository.save(hotel));
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!hotelRepository.existsById(id)) {
             throw new ResourceNotFoundException("Hotel no encontrado con id: " + id);
@@ -79,6 +87,7 @@ public class HotelService {
         hotelRepository.deleteById(id);
     }
 
+    @Transactional
     public void reducirPlazas(Long id, Integer plazas) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
@@ -89,6 +98,7 @@ public class HotelService {
         hotelRepository.save(hotel);
     }
 
+    @Transactional
     public void liberarPlazas(Long id, Integer plazas) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel no encontrado con id: " + id));
