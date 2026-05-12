@@ -41,6 +41,10 @@ public class Employee {
     @NotNull(message = "El estado de contratación es obligatorio")
     private Boolean hired;
 
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Column
+    private String password;
+
     @JsonIgnore
     @OneToMany(mappedBy = "employee")
     private List<Booking> bookings;

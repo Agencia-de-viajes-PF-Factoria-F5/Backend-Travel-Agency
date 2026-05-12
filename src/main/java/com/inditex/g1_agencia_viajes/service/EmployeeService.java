@@ -2,6 +2,7 @@ package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.model.Employee;
 import com.inditex.g1_agencia_viajes.repository.EmployeeRepository;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     public Employee saveEmployee(Employee employee) {
+        String passwordPlain = employee.getPassword();
+        String encryptedPassword = BCrypt.hashpw(passwordPlain, BCrypt.gensalt());
+        employee.setPassword(encryptedPassword);
         return employeeRepository.save(employee);
     }
 
