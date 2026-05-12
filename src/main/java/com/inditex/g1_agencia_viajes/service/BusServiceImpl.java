@@ -10,6 +10,7 @@ import com.inditex.g1_agencia_viajes.repository.BusRepository;
 import com.inditex.g1_agencia_viajes.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ public class BusServiceImpl implements BusService {
     private final DriverMapper driverMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<BusResponseDTO> getAll() {
         return busRepository.findAll()
                 .stream()
@@ -31,6 +33,7 @@ public class BusServiceImpl implements BusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BusResponseDTO getById(Long id) {
         Bus bus = busRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
@@ -38,6 +41,7 @@ public class BusServiceImpl implements BusService {
     }
 
     @Override
+    @Transactional
     public BusResponseDTO create(BusRequestDTO dto) {
         if (busRepository.existsByLicensePlate(dto.getLicensePlate())) {
             throw new RuntimeException("A bus with this license plate already exists: " + dto.getLicensePlate());
@@ -46,6 +50,7 @@ public class BusServiceImpl implements BusService {
     }
 
     @Override
+    @Transactional
     public BusResponseDTO update(Long id, BusRequestDTO dto) {
         Bus bus = busRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bus not found with id: " + id));
@@ -56,6 +61,7 @@ public class BusServiceImpl implements BusService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         if (!busRepository.existsById(id)) {
             throw new ResourceNotFoundException("Bus not found with id: " + id);
@@ -63,13 +69,11 @@ public class BusServiceImpl implements BusService {
         busRepository.deleteById(id);
     }
 
-    // ── Mappers ──────────────────────────────────────────
     private BusResponseDTO toResponseDTO(Bus bus) {
         BusResponseDTO dto = new BusResponseDTO();
         dto.setId(bus.getId());
         dto.setLicensePlate(bus.getLicensePlate());
         dto.setCapacity(bus.getCapacity());
-        /*dto.setAvailable(bus.getAvailable());*/
         dto.setDriver(driverMapper.toSummaryDTO(bus.getDriver()));
         return dto;
     }
