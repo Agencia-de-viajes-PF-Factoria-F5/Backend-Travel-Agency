@@ -29,13 +29,17 @@ public class TravelMapper {
         dto.setSale(travel.getSale());
         dto.setAvailablePlaces(travel.getAvailablePlaces());
         dto.setActive(travel.getActive());
-        dto.setHotelId(travel.getHotel().getId());
-        dto.setHotelName(travel.getHotel().getName());
-        dto.setHotelCity(travel.getHotel().getCity());
-        dto.setHotelCountry(travel.getHotel().getCountry());
-        dto.setHotelImageUrl(travel.getHotel().getImageUrl());
-        dto.setHalfBoardPrice(travel.getHotel().getHalfBoardPrice());
-        dto.setFullBoardPrice(travel.getHotel().getFullBoardPrice());
+
+        if (travel.getHotel() != null) {
+            dto.setHotelId(travel.getHotel().getId());
+            dto.setHotelName(travel.getHotel().getName());
+            dto.setHotelCity(travel.getHotel().getCity());
+            dto.setHotelCountry(travel.getHotel().getCountry());
+            dto.setHotelImageUrl(travel.getHotel().getImageUrl());
+            dto.setHalfBoardPrice(travel.getHotel().getHalfBoardPrice());
+            dto.setFullBoardPrice(travel.getHotel().getFullBoardPrice());
+        }
+
         return dto;
     }
 }

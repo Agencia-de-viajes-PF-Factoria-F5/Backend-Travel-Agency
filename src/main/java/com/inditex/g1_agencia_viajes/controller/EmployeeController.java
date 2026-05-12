@@ -2,7 +2,6 @@ package com.inditex.g1_agencia_viajes.controller;
 
 import com.inditex.g1_agencia_viajes.model.Employee;
 import com.inditex.g1_agencia_viajes.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,55 +9,52 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/employees") // Ruta base para este controlador
+@RequestMapping("/api/employees")
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
+
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Employee>> getAll() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+        return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Employee> getById(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Devuelve 404 si no existe
+            return ResponseEntity.notFound().build();
         }
-        return new ResponseEntity<>(employee, HttpStatus.OK);
+        return ResponseEntity.ok(employee);
     }
 
     @PostMapping
     public ResponseEntity<Employee> create(@RequestBody Employee employee) {
-        Employee savedEmployee = employeeService.saveEmployee(employee);
-        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED); // Devuelve 201 Created
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.saveEmployee(employee));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Employee> update(@PathVariable Long id, @RequestBody Employee employeeDetails) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
-
-        // Actualizamos los campos pertinentes
         employee.setGender(employeeDetails.getGender());
         employee.setWorkHour(employeeDetails.getWorkHour());
-
-        Employee updatedEmployee = employeeService.saveEmployee(employee);
-        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+        return ResponseEntity.ok(employeeService.saveEmployee(employee));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
         employeeService.deleteEmployee(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Devuelve 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }
