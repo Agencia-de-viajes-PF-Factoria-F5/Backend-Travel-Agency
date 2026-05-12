@@ -7,6 +7,7 @@ import com.inditex.g1_agencia_viajes.mapper.DriverMapper;
 import com.inditex.g1_agencia_viajes.model.Driver;
 import com.inditex.g1_agencia_viajes.repository.DriverRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +23,13 @@ public class DriverService {
         this.driverMapper = driverMapper;
     }
 
+    @Transactional
     public DriverResponseDTO create(DriverRequestDTO dto) {
         Driver driver = driverMapper.toEntity(dto);
         return driverMapper.toDTO(driverRepository.save(driver));
     }
 
+    @Transactional(readOnly = true)
     public List<DriverResponseDTO> getAll() {
         return driverRepository.findAll()
                 .stream()
@@ -34,12 +37,14 @@ public class DriverService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public DriverResponseDTO getById(Long id) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con id: " + id));
         return driverMapper.toDTO(driver);
     }
 
+    @Transactional(readOnly = true)
     public List<DriverResponseDTO> getActive() {
         return driverRepository.findByLicenceActive(true)
                 .stream()
@@ -47,17 +52,18 @@ public class DriverService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public DriverResponseDTO update(Long id, DriverRequestDTO dto) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con id: " + id));
-        if (dto.getName() != null)         driver.setName(dto.getName());
-        if (dto.getPhone() != null)        driver.setPhone(dto.getPhone());
-        /*if (dto.getEnrollment() != null)   driver.setEnrollment(dto.getEnrollment());^*/
-        if (dto.getImageUrl() != null)     driver.setImageUrl(dto.getImageUrl());
+        if (dto.getName() != null)          driver.setName(dto.getName());
+        if (dto.getPhone() != null)         driver.setPhone(dto.getPhone());
+        if (dto.getImageUrl() != null)      driver.setImageUrl(dto.getImageUrl());
         if (dto.getLicenceActive() != null) driver.setLicenceActive(dto.getLicenceActive());
         return driverMapper.toDTO(driverRepository.save(driver));
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!driverRepository.existsById(id)) {
             throw new ResourceNotFoundException("Conductor no encontrado con id: " + id);

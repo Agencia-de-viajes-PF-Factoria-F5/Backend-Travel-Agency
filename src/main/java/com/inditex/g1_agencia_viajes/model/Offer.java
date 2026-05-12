@@ -1,5 +1,6 @@
 package com.inditex.g1_agencia_viajes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ public class Offer {
     @Column(name = "start_date")
     private LocalDate startDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)
     private List<Travel> travels = new ArrayList<>();
 }

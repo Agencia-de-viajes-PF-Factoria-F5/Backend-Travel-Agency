@@ -8,6 +8,7 @@ import com.inditex.g1_agencia_viajes.model.Travel;
 import com.inditex.g1_agencia_viajes.repository.HotelRepository;
 import com.inditex.g1_agencia_viajes.repository.TravelRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +29,7 @@ public class TravelService {
         this.travelMapper = travelMapper;
     }
 
+    @Transactional(readOnly = true)
     public List<TravelResponseDTO> getAll() {
         return travelRepository.findAll()
                 .stream()
@@ -35,6 +37,7 @@ public class TravelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<TravelResponseDTO> getAvailable() {
         return travelRepository.findAll()
                 .stream()
@@ -44,6 +47,7 @@ public class TravelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<TravelResponseDTO> getOnSale() {
         return travelRepository.findAll()
                 .stream()
@@ -52,12 +56,14 @@ public class TravelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public TravelResponseDTO getById(Long id) {
         Travel travel = travelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Viaje no encontrado con id: " + id));
         return travelMapper.toDTO(travel);
     }
 
+    @Transactional
     public TravelResponseDTO create(TravelRequestDTO dto) {
         if (dto.getEndDate().isBefore(dto.getStartDate()) ||
                 dto.getEndDate().isEqual(dto.getStartDate())) {
@@ -69,6 +75,7 @@ public class TravelService {
         return travelMapper.toDTO(travelRepository.save(travel));
     }
 
+    @Transactional
     public TravelResponseDTO update(Long id, TravelRequestDTO dto) {
         Travel travel = travelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Viaje no encontrado con id: " + id));
@@ -87,6 +94,7 @@ public class TravelService {
         return travelMapper.toDTO(travelRepository.save(travel));
     }
 
+    @Transactional
     public void delete(Long id) {
         Travel travel = travelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Viaje no encontrado con id: " + id));
