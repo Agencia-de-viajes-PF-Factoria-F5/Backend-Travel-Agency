@@ -30,14 +30,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @ExceptionHandler(DriverOccupiedException.class)
-    public ResponseEntity<Map<String, String>> handleDriverOccupied(
-            DriverOccupiedException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
-    }
-
     @ExceptionHandler(HotelNotAvailableException.class)
     public ResponseEntity<Map<String, String>> handleHotelNotAvailable(
             HotelNotAvailableException ex) {

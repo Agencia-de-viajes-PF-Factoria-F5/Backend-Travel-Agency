@@ -32,8 +32,4 @@ public class Bus {
     private Boolean wifi;
     private Boolean AC;
     private Boolean USB;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id")
-    private Driver driver;
 }

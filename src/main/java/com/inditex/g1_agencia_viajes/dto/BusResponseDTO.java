@@ -13,5 +13,4 @@ public class BusResponseDTO {
     private Boolean AC;
     private Boolean USB;
     private Boolean available;
-    private DriverSummaryDTO driver;
 }

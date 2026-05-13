@@ -21,5 +21,4 @@ public class BusRequestDTO {
     private Boolean USB;
     private Boolean available;
 
-    private Long driverId;
 }

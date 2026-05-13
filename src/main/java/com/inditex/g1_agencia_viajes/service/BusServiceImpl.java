@@ -3,11 +3,8 @@ package com.inditex.g1_agencia_viajes.service;
 import com.inditex.g1_agencia_viajes.dto.BusRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BusResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
-import com.inditex.g1_agencia_viajes.mapper.DriverMapper;
 import com.inditex.g1_agencia_viajes.model.Bus;
-import com.inditex.g1_agencia_viajes.model.Driver;
 import com.inditex.g1_agencia_viajes.repository.BusRepository;
-import com.inditex.g1_agencia_viajes.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +17,6 @@ import java.util.stream.Collectors;
 public class BusServiceImpl implements BusService {
 
     private final BusRepository busRepository;
-    private final DriverRepository driverRepository;
-    private final DriverMapper driverMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,7 +55,6 @@ public class BusServiceImpl implements BusService {
         bus.setWifi(dto.getWifi());
         bus.setAC(dto.getAC());
         bus.setUSB(dto.getUSB());
-        bus.setDriver(resolveDriver(dto.getDriverId()));
         return toResponseDTO(busRepository.save(bus));
     }
 
@@ -82,7 +76,6 @@ public class BusServiceImpl implements BusService {
         dto.setWifi(bus.getWifi());
         dto.setAC(bus.getAC());
         dto.setUSB(bus.getUSB());
-        dto.setDriver(driverMapper.toSummaryDTO(bus.getDriver()));
         return dto;
     }
 
@@ -94,13 +87,6 @@ public class BusServiceImpl implements BusService {
         bus.setWifi(dto.getWifi());
         bus.setAC(dto.getAC());
         bus.setUSB(dto.getUSB());
-        bus.setDriver(resolveDriver(dto.getDriverId()));
         return bus;
-    }
-
-    private Driver resolveDriver(Long driverId) {
-        if (driverId == null) return null;
-        return driverRepository.findById(driverId)
-                .orElseThrow(() -> new ResourceNotFoundException("l conductor", driverId));
     }
 }

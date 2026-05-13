@@ -28,10 +28,6 @@ INSERT INTO buses (license_plate, capacity, bath, wifi, ac, usb) VALUES
     ('5678DEF', 40, false, true, true, false),
     ('9012GHI', 60, true, false, true, true);
 
-UPDATE buses SET driver_id = 1 WHERE id = 1;
-UPDATE buses SET driver_id = 2 WHERE id = 2;
-UPDATE buses SET driver_id = 3 WHERE id = 3;
-
 INSERT INTO hotels (name, address, city, country, stars, capacity, available_places, half_board_price, full_board_price, image_url, active) VALUES
     ('Hotel Madrid', 'Calle Gran Vía 1', 'Madrid', 'España', 4, 100, 100, 80.0, 120.0, null, true),
     ('Hotel Barcelona', 'Las Ramblas 25', 'Barcelona', 'España', 5, 150, 150, 100.0, 150.0, null, true),
