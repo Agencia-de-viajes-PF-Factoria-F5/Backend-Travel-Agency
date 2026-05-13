@@ -34,6 +34,9 @@ public class BookingPricingService {
 
     @Transactional(readOnly = true)
     public BookingQuoteResponseDTO quote(BookingQuoteRequestDTO request) {
+        if (request.getTypeBoard() == null) {
+            throw new IllegalArgumentException("El tipo de pensión es obligatorio");
+        }
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new ResourceNotFoundException("l viaje", + request.getTravelId()));
         List<User> customers = loadUsers(request.getCustomerIds());
@@ -42,8 +45,11 @@ public class BookingPricingService {
 
     @Transactional(readOnly = true)
     public Double calculateTotalPrice(Booking booking) {
-        if (booking.getTravel() == null || booking.getTravel().getId() == null) {
-            throw new ResourceNotFoundException("l viaje", + booking.getTravel().getId());
+        if (booking.getTravel() == null) {
+            throw new ResourceNotFoundException("l viaje", null);
+        }
+        if (booking.getTravel().getId() == null) {
+            throw new ResourceNotFoundException("l viaje", null);
         }
         if (booking.getTypeBoard() == null) {
             throw new IllegalArgumentException("El tipo de pensión es obligatorio");
