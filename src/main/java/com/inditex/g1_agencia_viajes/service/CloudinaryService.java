@@ -19,7 +19,10 @@ public class CloudinaryService {
 
     public String uploadImage(MultipartFile file) {
         try {
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("folder", "travel-agency")
+            );
             return uploadResult.get("secure_url").toString();
         } catch (IOException e) {
             throw new RuntimeException("Error al subir la imagen a Cloudinary", e);
