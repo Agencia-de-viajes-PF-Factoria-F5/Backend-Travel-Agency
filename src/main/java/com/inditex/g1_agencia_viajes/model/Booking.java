@@ -1,5 +1,6 @@
 package com.inditex.g1_agencia_viajes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -34,10 +35,12 @@ public class Booking {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travels_id")
     private Travel travel;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "customers_bookings",
