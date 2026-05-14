@@ -13,57 +13,75 @@ TRUNCATE TABLE users;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT INTO employees (name, surname, gender, work_hour, hired, password, role)
-VALUES
-    ('Juan', 'García', 'MALE', 40, true, '123456', 'ADMIN'),
-    ('Ana', 'López', 'FEMALE', 35, true, '123456', 'EDITOR'),
-    ('Carlos', 'Martínez', 'MALE', 40, true, '123456', 'VIEWER');
+-- EMPLOYEES
+INSERT INTO employees (gender, name, surname, work_hour, hired) VALUES
+('MALE', 'Carlos', 'Pérez', 40, true),
+('FEMALE', 'Ana', 'Sánchez', 35, true),
+('FEMALE', 'Sofía', 'Oliveira', 40, true),
+('MALE', 'David', 'Thimotheo', 20, true);
 
-INSERT INTO drivers (name, phone, licence_active, image_url) VALUES
-    ('Pedro',  '612345678', true, null),
-    ('Laura',  '698765432', true, null),
-    ('Miguel', '634567890', true, null);
+-- OFFERS
+INSERT INTO offers (offer_id, discount_percentage, start_date, end_date) VALUES
+(1, 10.00, '2026-01-01', '2026-01-15'),
+(2, 5.00, '2026-02-01', '2026-02-28'),
+(3, 0.00, '2026-03-01', '2026-05-01');
 
-INSERT INTO buses (license_plate, capacity, bath, wifi, ac, usb) VALUES
-    ('1234ABC', 50, true, true, true, true),
-    ('5678DEF', 40, false, true, true, false),
-    ('9012GHI', 60, true, false, true, true);
+-- HOTELS
+INSERT INTO hotels (name, address, city, country, stars, capacity, available_places, full_board_price, half_board_price, image_url, active) VALUES
+('Royal London Hotel 3*', '123 Cromwell Rd, South Kensington', 'London', 'United Kingdom', 3, 120, 120, 150.00, 110.00, 'https://riadelburgo.es/images/london_hotel3.jpg', true),
+('St Giles London Hotel', 'Bedford Ave, Bloomsbury', 'London', 'United Kingdom', 4, 250, 250, 185.00, 140.00, 'https://riadelburgo.es/images/stgiles_london.jpg', true),
+('President Hotel London', 'Russell Square, Holborn', 'London', 'United Kingdom', 4, 180, 180, 160.00, 125.00, 'https://riadelburgo.es/images/president_hotel.jpg', true);
 
-INSERT INTO hotels (name, address, city, country, stars, capacity, available_places, half_board_price, full_board_price, image_url, active) VALUES
-    ('Hotel Madrid', 'Calle Gran Vía 1', 'Madrid', 'España', 4, 100, 100, 80.0, 120.0, null, true),
-    ('Hotel Barcelona', 'Las Ramblas 25', 'Barcelona', 'España', 5, 150, 150, 100.0, 150.0, null, true),
-    ('Hotel Sevilla', 'Avenida de la Constitución 5', 'Sevilla', 'España', 3, 80, 80, 60.0, 90.0, null, true);
+-- BUSES
+INSERT INTO buses (capacity, license_plate, bath, wifi, AC, USB) VALUES
+(50, '1234-ABC', true, true, true, true),
+(55, '5678-DEF', true, false, true, true),
+(30, '9012-GHI', false, true, true, false);
 
-INSERT INTO offers (discount_percentage, start_date, end_date) VALUES
-    (10.0, '2026-05-01', '2026-08-31');
+-- DRIVERS
+INSERT INTO drivers (name, phone, licence_active) VALUES
+('John Smith', '447111222', true),
+('William Hill', '447333444', true),
+('Michael Brown', '447555666', true);
 
-INSERT INTO users (name, surname, email, dni, age, active) VALUES
-    ('María', 'García', 'maria@email.com', '12345678A', 30, true),
-    ('Carlos', 'López', 'carlos@email.com', '87654321B', 25, true),
-    ('Ana', 'Martínez', 'ana@email.com', '11223344C', 45, true),
-    ('Luis', 'Pérez', 'luis@email.com', '44332211D', 10, true);
+-- USERS
+INSERT INTO users (name, surname, email, tutor_id, age, passport, dni, active) VALUES
+('María', 'García López', 'maria.garcia@email.com', NULL, 42, 'PAA111222', '12345678A', true),
+('Carlos', 'García López', 'carlos.garcia@email.com', 1, 14, 'PAB333444', '87654321B', true),
+('Javier', 'Martínez Ruiz', 'javi.mar@email.com', NULL, 29, 'PAC555666', '45678912C', true),
+('Elena', 'Sanz Gómez', 'elena.sanz@email.com', NULL, 28, 'PAD777888', '98765432D', true),
+('Lucas', 'Fernández Tomé', 'lucas.ft@email.com', NULL, 35, 'PAE999000', '34567890E', true),
+('Roberto', 'Díaz Montero', 'roberto.diaz@email.com', NULL, 50, 'PAF123456', '23456789F', true),
+('Lucía', 'Díaz Montero', 'lucia.diaz@email.com', 6, 17, 'PAG654321', '76543210G', true);
 
--- Assign tutor for Luis Pérez (minor, age 10) → María García as tutor
-UPDATE users SET tutor_id = 1 WHERE id = 4;
+-- TRAVELS
+INSERT INTO travels (destiny, start_date, end_date, sale, offer_id, hotel_id, available_places) VALUES
+('Londres Clásico y Real - Grupo A', '2026-05-10', '2026-05-14', true, 1, 1, 35),
+('Londres Clásico y Real - Grupo B', '2026-05-10', '2026-05-14', true, 2, 2, 40),
+('Londres Clásico y Real - Edición Verano', '2026-07-15', '2026-07-19', false, 3, 3, 50);
 
-INSERT INTO travels (destiny, start_date, end_date, sale, available_places, hotel_id, active) VALUES
-    ('París', '2026-06-01', '2026-06-07', false, 50, 1, true),
-    ('Roma', '2026-07-15', '2026-07-22', true, 40, 2, true),
-    ('Londres', '2026-08-10', '2026-08-17', false, 60, 3, true);
+-- BOOKINGS
+INSERT INTO bookings (employee_id, travels_id, bought_date, type_board, is_group, total_price) VALUES
+(2, 1, '2026-01-10 10:15:00', 'FULL', true, 2322.00),
+(2, 1, '2026-02-14 18:45:00', 'HALF', true, 2451.00),
+(4, 2, '2026-03-20 12:00:00', 'FULL', false, 1290.00),
+(2, 3, '2026-04-05 09:30:00', 'FULL', true, 2580.00);
 
--- Apply discount offer to Roma travel
-UPDATE travels SET offer_id = 1 WHERE id = 2;
+-- TRIP SEGMENTS
+INSERT INTO trip_segments (origin, destination, start_time, end_time, bus_id, driver_id, travel_id) VALUES
+('Aeropuerto Gatwick', 'Royal London Hotel', '2026-05-10 11:00:00', '2026-05-10 12:30:00', 1, 1, 1),
+('Royal London Hotel', 'Castillo de Windsor', '2026-05-11 09:00:00', '2026-05-11 14:00:00', 1, 1, 1),
+('Castillo de Windsor', 'Kew Gardens', '2026-05-11 14:00:00', '2026-05-11 18:00:00', 1, 2, 1),
+('Royal London Hotel', 'Torre de Londres', '2026-05-12 09:30:00', '2026-05-12 13:00:00', 2, 3, 1),
+('London Eye', 'Crucero Támesis', '2026-05-13 16:00:00', '2026-05-13 19:00:00', 1, 1, 1),
+('Royal London Hotel', 'Aeropuerto Gatwick', '2026-05-14 15:00:00', '2026-05-14 16:30:00', 1, 2, 1);
 
-INSERT INTO trip_segments (travel_id, origin, destination, start_time, end_time, bus_id, driver_id) VALUES
-    (1, 'Madrid', 'París',   '2026-06-01 08:00:00', '2026-06-01 20:00:00', 1, 1),
-    (2, 'Madrid', 'Roma',    '2026-07-15 07:00:00', '2026-07-15 19:00:00', 2, 2),
-    (3, 'Madrid', 'Londres', '2026-08-10 09:00:00', '2026-08-10 21:00:00', 3, 3);
-
-INSERT INTO bookings (bought_date, type_board, is_group, total_price, travels_id, employee_id) VALUES
-    ('2026-04-15 10:30:00', 'HALF', false, 800.0,  1, 1),
-    ('2026-04-20 14:00:00', 'FULL', true,  1500.0, 2, 2);
-
+-- CUSTOMERS BOOKINGS
 INSERT INTO customers_bookings (booking_id, customer_id) VALUES
-    (1, 1),
-    (1, 2),
-    (2, 3);
+(1, 1),
+(1, 2),
+(2, 3),
+(2, 4),
+(3, 5),
+(4, 6),
+(4, 7);

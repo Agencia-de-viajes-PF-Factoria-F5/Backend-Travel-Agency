@@ -7,36 +7,23 @@ import com.inditex.g1_agencia_viajes.model.Hotel;
 import com.inditex.g1_agencia_viajes.model.Travel;
 import com.inditex.g1_agencia_viajes.repository.HotelRepository;
 import com.inditex.g1_agencia_viajes.repository.TravelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class TravelService {
 
-    private final TravelRepository travelRepository;
-    private final HotelRepository hotelRepository;
-    private final TravelMapper travelMapper;
+    @Autowired
+    private TravelRepository travelRepository;
 
-    public TravelService(TravelRepository travelRepository,
-                         HotelRepository hotelRepository,
-                         TravelMapper travelMapper) {
-        this.travelRepository = travelRepository;
-        this.hotelRepository = hotelRepository;
-        this.travelMapper = travelMapper;
-    }
-
-    @Transactional(readOnly = true)
-    public List<TravelResponseDTO> getAll() {
-        return travelRepository.findAll()
-                .stream()
-                .map(travelMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
+    public List<Travel> findAll() {
+        return travelRepository.findAll();
     @Transactional(readOnly = true)
     public List<TravelResponseDTO> getAvailable() {
         return travelRepository.findAll()
@@ -47,6 +34,8 @@ public class TravelService {
                 .collect(Collectors.toList());
     }
 
+    public Optional<Travel> findById(Long id) {
+        return travelRepository.findById(id);
     @Transactional(readOnly = true)
     public List<TravelResponseDTO> getOnSale() {
         return travelRepository.findAll()
@@ -56,6 +45,8 @@ public class TravelService {
                 .collect(Collectors.toList());
     }
 
+    public Travel save(Travel travel) {
+        return travelRepository.save(travel);
     @Transactional(readOnly = true)
     public TravelResponseDTO getById(Long id) {
         Travel travel = travelRepository.findById(id)
@@ -63,6 +54,7 @@ public class TravelService {
         return travelMapper.toDTO(travel);
     }
 
+    public Travel update(Long id, Travel travelDetails) {
     @Transactional
     public TravelResponseDTO create(TravelRequestDTO dto) {
         if (dto.getEndDate().isBefore(dto.getStartDate()) ||
@@ -78,6 +70,15 @@ public class TravelService {
     @Transactional
     public TravelResponseDTO update(Long id, TravelRequestDTO dto) {
         Travel travel = travelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Travel not found"));
+        travel.setDestiny(travelDetails.getDestiny());
+        travel.setStartDate(travelDetails.getStartDate());
+        travel.setEndDate(travelDetails.getEndDate());
+        travel.setSale(travelDetails.getSale());
+        travel.setAvailablePlaces(travelDetails.getAvailablePlaces());
+        travel.setHotel(travelDetails.getHotel());
+        travel.setOffer(travelDetails.getOffer());
+        return travelRepository.save(travel);
                 .orElseThrow(() -> new RuntimeException("Viaje no encontrado con id: " + id));
         if (dto.getEndDate().isBefore(dto.getStartDate()) ||
                 dto.getEndDate().isEqual(dto.getStartDate())) {
@@ -94,6 +95,10 @@ public class TravelService {
         return travelMapper.toDTO(travelRepository.save(travel));
     }
 
+    public void deleteById(Long id) {
+        travelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Travel not found"));
+        travelRepository.deleteById(id);
     @Transactional
     public void delete(Long id) {
         Travel travel = travelRepository.findById(id)

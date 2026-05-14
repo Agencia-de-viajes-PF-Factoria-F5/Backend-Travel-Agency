@@ -20,6 +20,8 @@ public class TravelResponseDTO {
     private String hotelCity;
     private String hotelCountry;
     private String hotelImageUrl;
+    private Integer hotelStars;
+    private Double discountPercentage;
     private Double halfBoardPrice;
     private Double fullBoardPrice;
 }
