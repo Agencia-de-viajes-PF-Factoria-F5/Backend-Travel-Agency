@@ -1,6 +1,7 @@
 package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.model.Offer;
+import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,13 +38,13 @@ public class OfferService {
             offer.setStartDate(offerDetails.getStartDate());
             offer.setEndDate(offerDetails.getEndDate());
             return offerRepository.save(offer);
-        }).orElseThrow(() -> new RuntimeException("Oferta no encontrada con el id: " + id));
+        }).orElseThrow(() -> new ResourceNotFoundException("la oferta", id));
     }
 
     @Transactional
     public void deleteById(Long id) {
         if (!offerRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. Oferta no encontrada con el id: " + id);
+            throw new ResourceNotFoundException("la oferta", id);
         }
         offerRepository.deleteById(id);
     }
