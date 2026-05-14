@@ -14,11 +14,11 @@ TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- EMPLOYEES
-INSERT INTO employees (gender, name, surname, work_hour, hired) VALUES
-('MALE', 'Carlos', 'Pérez', 40, true),
-('FEMALE', 'Ana', 'Sánchez', 35, true),
-('FEMALE', 'Sofía', 'Oliveira', 40, true),
-('MALE', 'David', 'Thimotheo', 20, true);
+INSERT INTO employees (gender, name, surname, work_hour, hired, password, role) VALUES
+('MALE', 'Carlos', 'Pérez', 40, true, '123456', 'ADMIN'),
+('FEMALE', 'Ana', 'Sánchez', 35, true, '123456', 'EDITOR'),
+('FEMALE', 'Sofía', 'Oliveira', 40, true, '123456', 'VIEWER'),
+('MALE', 'David', 'Thimotheo', 20, true, '123456', 'VIEWER');
 
 -- OFFERS
 INSERT INTO offers (offer_id, discount_percentage, start_date, end_date) VALUES
