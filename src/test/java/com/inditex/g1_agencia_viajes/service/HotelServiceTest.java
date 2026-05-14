@@ -184,17 +184,18 @@ class HotelServiceTest {
     }
 
     @Test
-    void delete_ShouldDeleteHotel() {
-        when(hotelRepository.existsById(1L)).thenReturn(true);
+    void delete_ShouldDeactivateHotel() {
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
 
         hotelService.delete(1L);
 
-        verify(hotelRepository).deleteById(1L);
+        assertThat(hotel.getActive()).isFalse();
+        verify(hotelRepository).save(hotel);
     }
 
     @Test
     void delete_ShouldThrowResourceNotFoundException() {
-        when(hotelRepository.existsById(99L)).thenReturn(false);
+        when(hotelRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> hotelService.delete(99L))
                 .isInstanceOf(ResourceNotFoundException.class);

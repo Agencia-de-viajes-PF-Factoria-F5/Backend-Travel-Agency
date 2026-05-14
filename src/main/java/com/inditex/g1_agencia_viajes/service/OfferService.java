@@ -1,7 +1,10 @@
 package com.inditex.g1_agencia_viajes.service;
 
-import com.inditex.g1_agencia_viajes.model.Offer;
+import com.inditex.g1_agencia_viajes.dto.OfferRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.OfferResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
+import com.inditex.g1_agencia_viajes.mapper.OfferMapper;
+import com.inditex.g1_agencia_viajes.model.Offer;
 import com.inditex.g1_agencia_viajes.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,36 +12,43 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OfferService {
 
     private final OfferRepository offerRepository;
+    private final OfferMapper offerMapper;
 
     @Transactional(readOnly = true)
-    public List<Offer> findAll() {
-        return offerRepository.findAll();
+    public List<OfferResponseDTO> findAll() {
+        return offerRepository.findAll()
+                .stream()
+                .map(offerMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Optional<Offer> findById(Long id) {
-        return offerRepository.findById(id);
+    public Optional<OfferResponseDTO> findById(Long id) {
+        return offerRepository.findById(id)
+                .map(offerMapper::toDTO);
     }
 
     @Transactional
-    public Offer save(Offer offer) {
-        return offerRepository.save(offer);
+    public OfferResponseDTO save(OfferRequestDTO dto) {
+        Offer offer = offerMapper.toEntity(dto);
+        return offerMapper.toDTO(offerRepository.save(offer));
     }
 
     @Transactional
-    public Offer update(Long id, Offer offerDetails) {
-        return offerRepository.findById(id).map(offer -> {
-            offer.setDiscountPercentage(offerDetails.getDiscountPercentage());
-            offer.setStartDate(offerDetails.getStartDate());
-            offer.setEndDate(offerDetails.getEndDate());
-            return offerRepository.save(offer);
-        }).orElseThrow(() -> new ResourceNotFoundException("la oferta", id));
+    public OfferResponseDTO update(Long id, OfferRequestDTO dto) {
+        Offer offer = offerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("la oferta", id));
+        offer.setDiscountPercentage(dto.getDiscountPercentage());
+        offer.setStartDate(dto.getStartDate());
+        offer.setEndDate(dto.getEndDate());
+        return offerMapper.toDTO(offerRepository.save(offer));
     }
 
     @Transactional

@@ -60,14 +60,15 @@ public class DriverService {
         if (dto.getPhone() != null)         driver.setPhone(dto.getPhone());
         if (dto.getImageUrl() != null)      driver.setImageUrl(dto.getImageUrl());
         if (dto.getLicenceActive() != null) driver.setLicenceActive(dto.getLicenceActive());
+        if (dto.getActive() != null)        driver.setActive(dto.getActive());
         return driverMapper.toDTO(driverRepository.save(driver));
     }
 
     @Transactional
     public void delete(Long id) {
-        if (!driverRepository.existsById(id)) {
-            throw new ResourceNotFoundException("l conductor", id);
-        }
-        driverRepository.deleteById(id);
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("l conductor", id));
+        driver.setActive(false);
+        driverRepository.save(driver);
     }
 }

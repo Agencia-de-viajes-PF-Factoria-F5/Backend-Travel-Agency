@@ -2,6 +2,7 @@ package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.dto.BusRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BusResponseDTO;
+import com.inditex.g1_agencia_viajes.exception.DuplicateLicensePlateException;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.model.Bus;
 import com.inditex.g1_agencia_viajes.repository.BusRepository;
@@ -95,7 +96,7 @@ class BusServiceImplTest {
         when(busRepository.existsByLicensePlate("ABC-1234")).thenReturn(true);
 
         assertThatThrownBy(() -> busService.create(requestDTO))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DuplicateLicensePlateException.class)
                 .hasMessageContaining("Ya existe un autobús");
     }
 
@@ -126,17 +127,18 @@ class BusServiceImplTest {
     }
 
     @Test
-    void delete_ShouldDeleteBus() {
-        when(busRepository.existsById(1L)).thenReturn(true);
+    void delete_ShouldDeactivateBus() {
+        when(busRepository.findById(1L)).thenReturn(Optional.of(bus));
 
         busService.delete(1L);
 
-        verify(busRepository).deleteById(1L);
+        assertThat(bus.getActive()).isFalse();
+        verify(busRepository).save(bus);
     }
 
     @Test
     void delete_ShouldThrowResourceNotFoundException() {
-        when(busRepository.existsById(99L)).thenReturn(false);
+        when(busRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> busService.delete(99L))
                 .isInstanceOf(ResourceNotFoundException.class);

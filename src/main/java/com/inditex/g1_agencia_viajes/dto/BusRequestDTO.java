@@ -19,5 +19,5 @@ public class BusRequestDTO {
     private Boolean wifi;
     private Boolean AC;
     private Boolean USB;
-
+    private Boolean active;
 }

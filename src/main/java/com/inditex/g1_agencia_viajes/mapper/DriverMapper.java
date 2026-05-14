@@ -16,6 +16,9 @@ public class DriverMapper {
         if (dto.getLicenceActive() != null) {
             driver.setLicenceActive(dto.getLicenceActive());
         }
+        if (dto.getActive() != null) {
+            driver.setActive(dto.getActive());
+        }
         return driver;
     }
 
@@ -26,6 +29,7 @@ public class DriverMapper {
         dto.setPhone(driver.getPhone());
         dto.setLicenceActive(driver.getLicenceActive());
         dto.setImageUrl(driver.getImageUrl());
+        dto.setActive(driver.getActive());
         return dto;
     }
 

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface DriverRepository extends JpaRepository<Driver, Long> {
     List<Driver> findByLicenceActive(boolean active);
+
+    List<Driver> findByActive(Boolean active);
 }

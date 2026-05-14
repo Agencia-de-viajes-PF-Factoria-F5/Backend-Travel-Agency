@@ -1,7 +1,9 @@
 package com.inditex.g1_agencia_viajes.controller;
 
-import com.inditex.g1_agencia_viajes.model.Offer;
+import com.inditex.g1_agencia_viajes.dto.OfferRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.OfferResponseDTO;
 import com.inditex.g1_agencia_viajes.service.OfferService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,38 +21,31 @@ public class OfferController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Offer>> getAll() {
+    public ResponseEntity<List<OfferResponseDTO>> getAll() {
         return ResponseEntity.ok(offerService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Offer> getById(@PathVariable Long id) {
+    public ResponseEntity<OfferResponseDTO> getById(@PathVariable Long id) {
         return offerService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Offer> create(@RequestBody Offer offer) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(offerService.save(offer));
+    public ResponseEntity<OfferResponseDTO> create(@Valid @RequestBody OfferRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(offerService.save(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Offer> update(@PathVariable Long id, @RequestBody Offer offerDetails) {
-        try {
-            return ResponseEntity.ok(offerService.update(id, offerDetails));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<OfferResponseDTO> update(@PathVariable Long id,
+                                                   @Valid @RequestBody OfferRequestDTO dto) {
+        return ResponseEntity.ok(offerService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            offerService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        offerService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -25,4 +25,6 @@ public class Driver {
     private Boolean licenceActive = true;
 
     private String imageUrl;
+
+    private Boolean active = true;
 }

@@ -1,5 +1,9 @@
 package com.inditex.g1_agencia_viajes.service;
 
+import com.inditex.g1_agencia_viajes.dto.OfferRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.OfferResponseDTO;
+import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
+import com.inditex.g1_agencia_viajes.mapper.OfferMapper;
 import com.inditex.g1_agencia_viajes.model.Offer;
 import com.inditex.g1_agencia_viajes.repository.OfferRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +26,16 @@ class OfferServiceTest {
     @Mock
     private OfferRepository offerRepository;
 
+    private OfferMapper offerMapper;
+
     private OfferService offerService;
 
     private Offer offer;
 
     @BeforeEach
     void setUp() {
-        offerService = new OfferService(offerRepository);
+        offerMapper = new OfferMapper();
+        offerService = new OfferService(offerRepository, offerMapper);
 
         offer = new Offer();
         offer.setOfferId(1L);
@@ -41,7 +48,7 @@ class OfferServiceTest {
     void findAll_ShouldReturnAllOffers() {
         when(offerRepository.findAll()).thenReturn(List.of(offer));
 
-        List<Offer> result = offerService.findAll();
+        List<OfferResponseDTO> result = offerService.findAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getOfferId()).isEqualTo(1L);
@@ -51,7 +58,7 @@ class OfferServiceTest {
     void findById_ShouldReturnOffer() {
         when(offerRepository.findById(1L)).thenReturn(Optional.of(offer));
 
-        Optional<Offer> result = offerService.findById(1L);
+        Optional<OfferResponseDTO> result = offerService.findById(1L);
 
         assertThat(result).isPresent();
         assertThat(result.get().getDiscountPercentage()).isEqualTo(20.0);
@@ -61,16 +68,21 @@ class OfferServiceTest {
     void findById_ShouldReturnEmptyOptional() {
         when(offerRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Optional<Offer> result = offerService.findById(99L);
+        Optional<OfferResponseDTO> result = offerService.findById(99L);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void save_ShouldSaveOffer() {
-        when(offerRepository.save(offer)).thenReturn(offer);
+        OfferRequestDTO dto = new OfferRequestDTO();
+        dto.setDiscountPercentage(20.0);
+        dto.setStartDate(LocalDate.of(2026, 1, 1));
+        dto.setEndDate(LocalDate.of(2026, 12, 31));
 
-        Offer result = offerService.save(offer);
+        when(offerRepository.save(any(Offer.class))).thenReturn(offer);
+
+        OfferResponseDTO result = offerService.save(dto);
 
         assertThat(result).isNotNull();
         assertThat(result.getDiscountPercentage()).isEqualTo(20.0);
@@ -78,28 +90,27 @@ class OfferServiceTest {
 
     @Test
     void update_ShouldUpdateOffer() {
-        Offer offerDetails = new Offer();
-        offerDetails.setDiscountPercentage(30.0);
-        offerDetails.setStartDate(LocalDate.of(2026, 3, 1));
-        offerDetails.setEndDate(LocalDate.of(2026, 6, 30));
+        OfferRequestDTO dto = new OfferRequestDTO();
+        dto.setDiscountPercentage(30.0);
+        dto.setStartDate(LocalDate.of(2026, 3, 1));
+        dto.setEndDate(LocalDate.of(2026, 6, 30));
 
         when(offerRepository.findById(1L)).thenReturn(Optional.of(offer));
         when(offerRepository.save(any(Offer.class))).thenReturn(offer);
 
-        Offer result = offerService.update(1L, offerDetails);
+        OfferResponseDTO result = offerService.update(1L, dto);
 
         assertThat(result).isNotNull();
-        assertThat(offer.getDiscountPercentage()).isEqualTo(30.0);
-        assertThat(offer.getStartDate()).isEqualTo(LocalDate.of(2026, 3, 1));
-        assertThat(offer.getEndDate()).isEqualTo(LocalDate.of(2026, 6, 30));
+        assertThat(result.getDiscountPercentage()).isEqualTo(30.0);
     }
 
     @Test
-    void update_ShouldThrowRuntimeException() {
+    void update_ShouldThrowResourceNotFoundException() {
         when(offerRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> offerService.update(99L, new Offer()))
-                .isInstanceOf(RuntimeException.class)
+        OfferRequestDTO dto = new OfferRequestDTO();
+        assertThatThrownBy(() -> offerService.update(99L, dto))
+                .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Oferta no encontrada");
     }
 
@@ -113,11 +124,10 @@ class OfferServiceTest {
     }
 
     @Test
-    void deleteById_ShouldThrowRuntimeException() {
+    void deleteById_ShouldThrowResourceNotFoundException() {
         when(offerRepository.existsById(99L)).thenReturn(false);
 
         assertThatThrownBy(() -> offerService.deleteById(99L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("No se puede eliminar");
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 }

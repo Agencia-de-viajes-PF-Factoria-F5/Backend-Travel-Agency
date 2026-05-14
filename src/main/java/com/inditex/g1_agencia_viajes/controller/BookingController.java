@@ -2,7 +2,8 @@ package com.inditex.g1_agencia_viajes.controller;
 
 import com.inditex.g1_agencia_viajes.dto.BookingQuoteRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BookingQuoteResponseDTO;
-import com.inditex.g1_agencia_viajes.model.Booking;
+import com.inditex.g1_agencia_viajes.dto.BookingRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.BookingResponseDTO;
 import com.inditex.g1_agencia_viajes.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,20 +23,20 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Booking>> getAllBookings() {
+    public ResponseEntity<List<BookingResponseDTO>> getAllBookings() {
         return ResponseEntity.ok(bookingService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
+    public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable Long id) {
         return bookingService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Booking> createBooking(@Valid @RequestBody Booking booking) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.save(booking));
+    public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.save(dto));
     }
 
     @PostMapping("/quote")
@@ -44,21 +45,14 @@ public class BookingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @Valid @RequestBody Booking bookingDetails) {
-        try {
-            return ResponseEntity.ok(bookingService.update(id, bookingDetails));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<BookingResponseDTO> updateBooking(@PathVariable Long id,
+                                                            @Valid @RequestBody BookingRequestDTO dto) {
+        return ResponseEntity.ok(bookingService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
-        try {
-            bookingService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        bookingService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

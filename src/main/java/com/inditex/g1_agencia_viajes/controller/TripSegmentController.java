@@ -1,6 +1,7 @@
 package com.inditex.g1_agencia_viajes.controller;
 
-import com.inditex.g1_agencia_viajes.model.TripSegment;
+import com.inditex.g1_agencia_viajes.dto.TripSegmentRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.TripSegmentResponseDTO;
 import com.inditex.g1_agencia_viajes.service.TripSegmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,24 +26,24 @@ public class TripSegmentController {
     private final TripSegmentService tripSegmentService;
 
     @GetMapping
-    public ResponseEntity<List<TripSegment>> getAll() {
+    public ResponseEntity<List<TripSegmentResponseDTO>> getAll() {
         return ResponseEntity.ok(tripSegmentService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TripSegment> getById(@PathVariable Long id) {
+    public ResponseEntity<TripSegmentResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(tripSegmentService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<TripSegment> create(@Valid @RequestBody TripSegment tripSegment) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(tripSegmentService.create(tripSegment));
+    public ResponseEntity<TripSegmentResponseDTO> create(@Valid @RequestBody TripSegmentRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(tripSegmentService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TripSegment> update(@PathVariable Long id,
-                                              @Valid @RequestBody TripSegment tripSegment) {
-        return ResponseEntity.ok(tripSegmentService.update(id, tripSegment));
+    public ResponseEntity<TripSegmentResponseDTO> update(@PathVariable Long id,
+                                                         @Valid @RequestBody TripSegmentRequestDTO dto) {
+        return ResponseEntity.ok(tripSegmentService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")

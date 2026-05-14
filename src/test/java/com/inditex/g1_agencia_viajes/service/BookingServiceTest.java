@@ -2,11 +2,16 @@ package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.dto.BookingQuoteRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BookingQuoteResponseDTO;
+import com.inditex.g1_agencia_viajes.dto.BookingRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.BookingResponseDTO;
 import com.inditex.g1_agencia_viajes.dto.BookingUserRequestDTO;
 import com.inditex.g1_agencia_viajes.exception.MinorWithoutTutorException;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
+import com.inditex.g1_agencia_viajes.mapper.BookingMapper;
 import com.inditex.g1_agencia_viajes.model.*;
 import com.inditex.g1_agencia_viajes.repository.BookingRepository;
+import com.inditex.g1_agencia_viajes.repository.EmployeeRepository;
+import com.inditex.g1_agencia_viajes.repository.TravelRepository;
 import com.inditex.g1_agencia_viajes.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,26 +39,32 @@ class BookingServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private TravelRepository travelRepository;
+
+    @Mock
+    private EmployeeRepository employeeRepository;
+
+    @Mock
     private BookingPricingService bookingPricingService;
+
+    private BookingMapper bookingMapper;
 
     private BookingService bookingService;
 
     private Booking booking;
     private User adultUser;
     private User minorWithoutTutor;
-    private User minorWithTutor;
-    private User tutor;
+    private Travel travel;
 
     @BeforeEach
     void setUp() {
-        bookingService = new BookingService(bookingRepository, userRepository, bookingPricingService);
+        bookingMapper = new BookingMapper();
+        bookingService = new BookingService(bookingRepository, userRepository, travelRepository,
+                employeeRepository, bookingPricingService, bookingMapper);
 
-        tutor = new User();
-        tutor.setId(1L);
-        tutor.setName("Tutor");
-        tutor.setSurname("Test");
-        tutor.setAge(30);
-        tutor.setEmail("tutor@test.com");
+        travel = new Travel();
+        travel.setId(1L);
+        travel.setDestiny("Paris");
 
         adultUser = new User();
         adultUser.setId(2L);
@@ -62,23 +73,12 @@ class BookingServiceTest {
         adultUser.setAge(25);
         adultUser.setEmail("adult@test.com");
 
-        minorWithTutor = new User();
-        minorWithTutor.setId(3L);
-        minorWithTutor.setName("Minor");
-        minorWithTutor.setSurname("WithTutor");
-        minorWithTutor.setAge(15);
-        minorWithTutor.setTutorId(tutor);
-        minorWithTutor.setEmail("minorwt@test.com");
-
         minorWithoutTutor = new User();
         minorWithoutTutor.setId(4L);
         minorWithoutTutor.setName("Minor");
         minorWithoutTutor.setSurname("NoTutor");
         minorWithoutTutor.setAge(16);
         minorWithoutTutor.setEmail("minornt@test.com");
-
-        Travel travel = new Travel();
-        travel.setId(1L);
 
         booking = new Booking();
         booking.setBookingId(1L);
@@ -94,16 +94,17 @@ class BookingServiceTest {
     void findAll_ShouldReturnAllBookings() {
         when(bookingRepository.findAll()).thenReturn(List.of(booking));
 
-        List<Booking> result = bookingService.findAll();
+        List<BookingResponseDTO> result = bookingService.findAll();
 
         assertThat(result).hasSize(1);
+        assertThat(result.get(0).getBookingId()).isEqualTo(1L);
     }
 
     @Test
     void findById_ShouldReturnBooking() {
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
 
-        Optional<Booking> result = bookingService.findById(1L);
+        Optional<BookingResponseDTO> result = bookingService.findById(1L);
 
         assertThat(result).isPresent();
         assertThat(result.get().getBookingId()).isEqualTo(1L);
@@ -113,61 +114,64 @@ class BookingServiceTest {
     void findById_ShouldReturnEmptyOptional() {
         when(bookingRepository.findById(99L)).thenReturn(Optional.empty());
 
-        Optional<Booking> result = bookingService.findById(99L);
+        Optional<BookingResponseDTO> result = bookingService.findById(99L);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void save_ShouldSaveBookingWithValidCustomers() {
-        booking.setCustomers(List.of(adultUser));
-        when(userRepository.findById(adultUser.getId())).thenReturn(Optional.of(adultUser));
-        when(bookingPricingService.calculateTotalPrice(booking)).thenReturn(500.0);
-        when(bookingRepository.save(booking)).thenReturn(booking);
+        BookingRequestDTO dto = new BookingRequestDTO();
+        dto.setTypeBoard(TypeBoard.HALF);
+        dto.setTravelId(1L);
+        dto.setCustomerIds(List.of(2L));
 
-        Booking result = bookingService.save(booking);
+        when(travelRepository.findById(1L)).thenReturn(Optional.of(travel));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(adultUser));
+        when(bookingPricingService.calculateTotalPrice(any(Booking.class))).thenReturn(500.0);
+        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
+
+        BookingResponseDTO result = bookingService.save(dto);
 
         assertThat(result).isNotNull();
-        verify(userRepository).findById(adultUser.getId());
-        verify(bookingPricingService).calculateTotalPrice(booking);
+        verify(travelRepository).findById(1L);
+        verify(userRepository).findById(2L);
+        verify(bookingPricingService).calculateTotalPrice(any(Booking.class));
     }
 
     @Test
     void save_ShouldThrowMinorWithoutTutorException() {
-        booking.setCustomers(List.of(minorWithoutTutor));
-        when(userRepository.findById(minorWithoutTutor.getId())).thenReturn(Optional.of(minorWithoutTutor));
+        BookingRequestDTO dto = new BookingRequestDTO();
+        dto.setTypeBoard(TypeBoard.HALF);
+        dto.setTravelId(1L);
+        dto.setCustomerIds(List.of(4L));
 
-        assertThatThrownBy(() -> bookingService.save(booking))
+        when(travelRepository.findById(1L)).thenReturn(Optional.of(travel));
+        when(userRepository.findById(4L)).thenReturn(Optional.of(minorWithoutTutor));
+
+        assertThatThrownBy(() -> bookingService.save(dto))
                 .isInstanceOf(MinorWithoutTutorException.class);
     }
 
     @Test
-    void save_ShouldThrowIllegalArgumentExceptionWhenCustomerHasNoId() {
-        User customerWithoutId = new User();
-        customerWithoutId.setName("NoId");
-        booking.setCustomers(List.of(customerWithoutId));
-
-        assertThatThrownBy(() -> bookingService.save(booking))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     void update_ShouldUpdateBooking() {
-        Booking bookingDetails = new Booking();
-        bookingDetails.setBoughtDate(LocalDateTime.now());
-        bookingDetails.setTypeBoard(TypeBoard.FULL);
-        bookingDetails.setIsGroup(true);
-        bookingDetails.setCustomers(List.of(adultUser));
-        Travel travel = new Travel();
-        travel.setId(2L);
-        bookingDetails.setTravel(travel);
+        BookingRequestDTO dto = new BookingRequestDTO();
+        dto.setBoughtDate(LocalDateTime.now());
+        dto.setTypeBoard(TypeBoard.FULL);
+        dto.setIsGroup(true);
+        dto.setTravelId(2L);
+        dto.setCustomerIds(List.of(2L));
+
+        Travel newTravel = new Travel();
+        newTravel.setId(2L);
 
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(userRepository.findById(adultUser.getId())).thenReturn(Optional.of(adultUser));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(adultUser));
+        when(travelRepository.findById(2L)).thenReturn(Optional.of(newTravel));
         when(bookingPricingService.calculateTotalPrice(any(Booking.class))).thenReturn(800.0);
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
 
-        Booking result = bookingService.update(1L, bookingDetails);
+        BookingResponseDTO result = bookingService.update(1L, dto);
 
         assertThat(result).isNotNull();
     }
@@ -176,7 +180,8 @@ class BookingServiceTest {
     void update_ShouldThrowResourceNotFoundException() {
         when(bookingRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookingService.update(99L, new Booking()))
+        BookingRequestDTO dto = new BookingRequestDTO();
+        assertThatThrownBy(() -> bookingService.update(99L, dto))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 

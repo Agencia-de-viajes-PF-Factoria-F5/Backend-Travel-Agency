@@ -81,10 +81,10 @@ public class HotelService {
 
     @Transactional
     public void delete(Long id) {
-        if (!hotelRepository.existsById(id)) {
-            throw new ResourceNotFoundException("l hotel", id);
-        }
-        hotelRepository.deleteById(id);
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("l hotel", id));
+        hotel.setActive(false);
+        hotelRepository.save(hotel);
     }
 
     @Transactional

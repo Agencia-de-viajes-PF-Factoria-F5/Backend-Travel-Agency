@@ -2,6 +2,7 @@ package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.dto.BusRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BusResponseDTO;
+import com.inditex.g1_agencia_viajes.exception.DuplicateLicensePlateException;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.model.Bus;
 import com.inditex.g1_agencia_viajes.repository.BusRepository;
@@ -39,7 +40,7 @@ public class BusServiceImpl implements BusService {
     @Transactional
     public BusResponseDTO create(BusRequestDTO dto) {
         if (busRepository.existsByLicensePlate(dto.getLicensePlate())) {
-            throw new RuntimeException("Ya existe un autobús con el número de placa: " + dto.getLicensePlate());
+            throw new DuplicateLicensePlateException(dto.getLicensePlate());
         }
         return toResponseDTO(busRepository.save(toEntity(dto)));
     }
@@ -61,10 +62,10 @@ public class BusServiceImpl implements BusService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!busRepository.existsById(id)) {
-            throw new ResourceNotFoundException("l bus", id);
-        }
-        busRepository.deleteById(id);
+        Bus bus = busRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("l bus", id));
+        bus.setActive(false);
+        busRepository.save(bus);
     }
 
     private BusResponseDTO toResponseDTO(Bus bus) {
@@ -76,6 +77,7 @@ public class BusServiceImpl implements BusService {
         dto.setWifi(bus.getWifi());
         dto.setAC(bus.getAC());
         dto.setUSB(bus.getUSB());
+        dto.setActive(bus.getActive());
         return dto;
     }
 
@@ -87,6 +89,9 @@ public class BusServiceImpl implements BusService {
         bus.setWifi(dto.getWifi());
         bus.setAC(dto.getAC());
         bus.setUSB(dto.getUSB());
+        if (dto.getActive() != null) {
+            bus.setActive(dto.getActive());
+        }
         return bus;
     }
 }

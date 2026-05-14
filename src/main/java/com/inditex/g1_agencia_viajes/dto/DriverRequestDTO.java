@@ -15,4 +15,6 @@ public class DriverRequestDTO {
     private Boolean licenceActive;
 
     private String imageUrl;
+
+    private Boolean active;
 }

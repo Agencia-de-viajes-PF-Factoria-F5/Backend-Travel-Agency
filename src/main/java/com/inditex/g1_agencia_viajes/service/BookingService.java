@@ -3,11 +3,18 @@ package com.inditex.g1_agencia_viajes.service;
 import com.inditex.g1_agencia_viajes.dto.BookingUserRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BookingQuoteRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BookingQuoteResponseDTO;
+import com.inditex.g1_agencia_viajes.dto.BookingRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.BookingResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.MinorWithoutTutorException;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
+import com.inditex.g1_agencia_viajes.mapper.BookingMapper;
 import com.inditex.g1_agencia_viajes.model.Booking;
+import com.inditex.g1_agencia_viajes.model.Employee;
+import com.inditex.g1_agencia_viajes.model.Travel;
 import com.inditex.g1_agencia_viajes.model.User;
 import com.inditex.g1_agencia_viajes.repository.BookingRepository;
+import com.inditex.g1_agencia_viajes.repository.EmployeeRepository;
+import com.inditex.g1_agencia_viajes.repository.TravelRepository;
 import com.inditex.g1_agencia_viajes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,41 +30,74 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private final TravelRepository travelRepository;
+    private final EmployeeRepository employeeRepository;
     private final BookingPricingService bookingPricingService;
+    private final BookingMapper bookingMapper;
 
     @Transactional(readOnly = true)
-    public List<Booking> findAll() {
-        return bookingRepository.findAll();
+    public List<BookingResponseDTO> findAll() {
+        return bookingMapper.toDTOList(bookingRepository.findAll());
     }
 
     @Transactional(readOnly = true)
-    public Optional<Booking> findById(Long id) {
-        return bookingRepository.findById(id);
+    public Optional<BookingResponseDTO> findById(Long id) {
+        return bookingRepository.findById(id)
+                .map(bookingMapper::toDTO);
     }
 
     @Transactional
-    public Booking save(Booking booking) {
-        List<User> resolvedCustomers = resolveCustomers(booking.getCustomers());
+    public BookingResponseDTO save(BookingRequestDTO dto) {
+        Booking booking = new Booking();
+        booking.setBoughtDate(dto.getBoughtDate());
+        booking.setTypeBoard(dto.getTypeBoard());
+        booking.setIsGroup(dto.getIsGroup());
+
+        Travel travel = travelRepository.findById(dto.getTravelId())
+                .orElseThrow(() -> new ResourceNotFoundException("l viaje", dto.getTravelId()));
+        booking.setTravel(travel);
+
+        if (dto.getEmployeeId() != null) {
+            Employee employee = employeeRepository.findById(dto.getEmployeeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("l empleado", dto.getEmployeeId()));
+            booking.setEmployee(employee);
+        }
+
+        List<User> resolvedCustomers = resolveCustomersByIds(dto.getCustomerIds());
         validateCustomersForBooking(resolvedCustomers);
         booking.setCustomers(resolvedCustomers);
+
         booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
-        return bookingRepository.save(booking);
+        return bookingMapper.toDTO(bookingRepository.save(booking));
     }
 
     @Transactional
-    public Booking update(Long id, Booking bookingDetails) {
-        return bookingRepository.findById(id).map(booking -> {
-            List<User> resolvedCustomers = resolveCustomers(bookingDetails.getCustomers());
-            validateCustomersForBooking(resolvedCustomers);
-            booking.setCustomers(resolvedCustomers);
-            booking.setBoughtDate(bookingDetails.getBoughtDate());
-            booking.setTypeBoard(bookingDetails.getTypeBoard());
-            booking.setIsGroup(bookingDetails.getIsGroup());
-            booking.setTravel(bookingDetails.getTravel());
-            booking.setEmployee(bookingDetails.getEmployee());
-            booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
-            return bookingRepository.save(booking);
-        }).orElseThrow(() -> new ResourceNotFoundException(" la reserva", id));
+    public BookingResponseDTO update(Long id, BookingRequestDTO dto) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(" la reserva", id));
+
+        booking.setBoughtDate(dto.getBoughtDate());
+        booking.setTypeBoard(dto.getTypeBoard());
+        booking.setIsGroup(dto.getIsGroup());
+
+        if (dto.getTravelId() != null) {
+            Travel travel = travelRepository.findById(dto.getTravelId())
+                    .orElseThrow(() -> new ResourceNotFoundException("l viaje", dto.getTravelId()));
+            booking.setTravel(travel);
+        }
+
+        if (dto.getEmployeeId() != null) {
+            Employee employee = employeeRepository.findById(dto.getEmployeeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("l empleado", dto.getEmployeeId()));
+            booking.setEmployee(employee);
+        }
+
+        List<User> resolvedCustomers = resolveCustomersByIds(dto.getCustomerIds());
+        validateCustomersForBooking(resolvedCustomers);
+        booking.setCustomers(resolvedCustomers);
+
+        booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
+        return bookingMapper.toDTO(bookingRepository.save(booking));
     }
 
     @Transactional
@@ -104,20 +144,16 @@ public class BookingService {
         }
     }
 
-    private List<User> resolveCustomers(List<User> customers) {
-        if (customers == null) {
-            return null;
+    private List<User> resolveCustomersByIds(List<Long> customerIds) {
+        if (customerIds == null || customerIds.isEmpty()) {
+            return new ArrayList<>();
         }
 
         List<User> resolvedCustomers = new ArrayList<>();
-        for (User customer : customers) {
-            if (customer == null || customer.getId() == null) {
-                throw new IllegalArgumentException("Cada cliente debe incluir un ID");
-            }
-
-            User resolvedCustomer = userRepository.findById(customer.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("l cliente", customer.getId()));
-            resolvedCustomers.add(resolvedCustomer);
+        for (Long id : customerIds) {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("l cliente", id));
+            resolvedCustomers.add(user);
         }
         return resolvedCustomers;
     }

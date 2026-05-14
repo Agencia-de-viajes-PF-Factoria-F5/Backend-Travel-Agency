@@ -1,10 +1,16 @@
 package com.inditex.g1_agencia_viajes.service;
 
+import com.inditex.g1_agencia_viajes.dto.TripSegmentRequestDTO;
+import com.inditex.g1_agencia_viajes.dto.TripSegmentResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
+import com.inditex.g1_agencia_viajes.mapper.TripSegmentMapper;
 import com.inditex.g1_agencia_viajes.model.Bus;
 import com.inditex.g1_agencia_viajes.model.Driver;
 import com.inditex.g1_agencia_viajes.model.Travel;
 import com.inditex.g1_agencia_viajes.model.TripSegment;
+import com.inditex.g1_agencia_viajes.repository.BusRepository;
+import com.inditex.g1_agencia_viajes.repository.DriverRepository;
+import com.inditex.g1_agencia_viajes.repository.TravelRepository;
 import com.inditex.g1_agencia_viajes.repository.TripSegmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +32,17 @@ class TripSegmentServiceTest {
     @Mock
     private TripSegmentRepository tripSegmentRepository;
 
+    @Mock
+    private TravelRepository travelRepository;
+
+    @Mock
+    private BusRepository busRepository;
+
+    @Mock
+    private DriverRepository driverRepository;
+
+    private TripSegmentMapper tripSegmentMapper;
+
     private TripSegmentService tripSegmentService;
 
     private TripSegment tripSegment;
@@ -35,16 +52,20 @@ class TripSegmentServiceTest {
 
     @BeforeEach
     void setUp() {
-        tripSegmentService = new TripSegmentService(tripSegmentRepository);
+        tripSegmentMapper = new TripSegmentMapper();
+        tripSegmentService = new TripSegmentService(tripSegmentRepository, travelRepository,
+                busRepository, driverRepository, tripSegmentMapper);
 
         travel = new Travel();
         travel.setId(1L);
 
         bus = new Bus();
         bus.setId(1L);
+        bus.setLicensePlate("ABC-123");
 
         driver = new Driver();
         driver.setId(1L);
+        driver.setName("Driver Test");
 
         tripSegment = new TripSegment();
         tripSegment.setId(1L);
@@ -61,7 +82,7 @@ class TripSegmentServiceTest {
     void getAll_ShouldReturnAllSegments() {
         when(tripSegmentRepository.findAll()).thenReturn(List.of(tripSegment));
 
-        List<TripSegment> result = tripSegmentService.getAll();
+        List<TripSegmentResponseDTO> result = tripSegmentService.getAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getOrigin()).isEqualTo("Madrid");
@@ -71,7 +92,7 @@ class TripSegmentServiceTest {
     void getById_ShouldReturnSegment() {
         when(tripSegmentRepository.findById(1L)).thenReturn(Optional.of(tripSegment));
 
-        TripSegment result = tripSegmentService.getById(1L);
+        TripSegmentResponseDTO result = tripSegmentService.getById(1L);
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
@@ -87,66 +108,57 @@ class TripSegmentServiceTest {
 
     @Test
     void create_ShouldCreateSegment() {
-        when(tripSegmentRepository.save(tripSegment)).thenReturn(tripSegment);
+        TripSegmentRequestDTO dto = new TripSegmentRequestDTO();
+        dto.setTravelId(1L);
+        dto.setOrigin("Madrid");
+        dto.setDestination("Barcelona");
+        dto.setStartTime(LocalDateTime.of(2026, 6, 15, 8, 0));
+        dto.setEndTime(LocalDateTime.of(2026, 6, 15, 12, 0));
+        dto.setBusId(1L);
+        dto.setDriverId(1L);
 
-        TripSegment result = tripSegmentService.create(tripSegment);
+        when(travelRepository.findById(1L)).thenReturn(Optional.of(travel));
+        when(busRepository.findById(1L)).thenReturn(Optional.of(bus));
+        when(driverRepository.findById(1L)).thenReturn(Optional.of(driver));
+        when(tripSegmentRepository.save(any(TripSegment.class))).thenReturn(tripSegment);
+
+        TripSegmentResponseDTO result = tripSegmentService.create(dto);
 
         assertThat(result).isNotNull();
-    }
-
-    @Test
-    void create_ShouldThrowWhenTravelIsNull() {
-        tripSegment.setTravel(null);
-
-        assertThatThrownBy(() -> tripSegmentService.create(tripSegment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Travel is required");
-    }
-
-    @Test
-    void create_ShouldThrowWhenTravelIdIsNull() {
-        tripSegment.getTravel().setId(null);
-
-        assertThatThrownBy(() -> tripSegmentService.create(tripSegment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Travel is required");
-    }
-
-    @Test
-    void create_ShouldThrowWhenBusIsNull() {
-        tripSegment.setBus(null);
-
-        assertThatThrownBy(() -> tripSegmentService.create(tripSegment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Bus is required");
-    }
-
-    @Test
-    void create_ShouldThrowWhenDriverIsNull() {
-        tripSegment.setDriver(null);
-
-        assertThatThrownBy(() -> tripSegmentService.create(tripSegment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Driver is required");
+        verify(travelRepository).findById(1L);
+        verify(busRepository).findById(1L);
+        verify(driverRepository).findById(1L);
     }
 
     @Test
     void update_ShouldUpdateSegment() {
-        TripSegment segmentDetails = new TripSegment();
-        segmentDetails.setTravel(travel);
-        segmentDetails.setOrigin("Barcelona");
-        segmentDetails.setDestination("Madrid");
-        segmentDetails.setStartTime(LocalDateTime.of(2026, 6, 16, 8, 0));
-        segmentDetails.setEndTime(LocalDateTime.of(2026, 6, 16, 12, 0));
-        segmentDetails.setBus(bus);
-        segmentDetails.setDriver(driver);
+        TripSegmentRequestDTO dto = new TripSegmentRequestDTO();
+        dto.setTravelId(1L);
+        dto.setOrigin("Barcelona");
+        dto.setDestination("Madrid");
+        dto.setStartTime(LocalDateTime.of(2026, 6, 16, 8, 0));
+        dto.setEndTime(LocalDateTime.of(2026, 6, 16, 12, 0));
+        dto.setBusId(1L);
+        dto.setDriverId(1L);
 
         when(tripSegmentRepository.findById(1L)).thenReturn(Optional.of(tripSegment));
+        when(travelRepository.findById(1L)).thenReturn(Optional.of(travel));
+        when(busRepository.findById(1L)).thenReturn(Optional.of(bus));
+        when(driverRepository.findById(1L)).thenReturn(Optional.of(driver));
         when(tripSegmentRepository.save(any(TripSegment.class))).thenReturn(tripSegment);
 
-        TripSegment result = tripSegmentService.update(1L, segmentDetails);
+        TripSegmentResponseDTO result = tripSegmentService.update(1L, dto);
 
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    void update_ShouldThrowResourceNotFoundException() {
+        when(tripSegmentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        TripSegmentRequestDTO dto = new TripSegmentRequestDTO();
+        assertThatThrownBy(() -> tripSegmentService.update(99L, dto))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test

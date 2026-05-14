@@ -9,4 +9,5 @@ public class DriverResponseDTO {
     private String phone;
     private Boolean licenceActive;
     private String imageUrl;
+    private Boolean active;
 }

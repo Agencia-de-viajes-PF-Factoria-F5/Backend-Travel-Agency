@@ -141,17 +141,18 @@ class DriverServiceTest {
     }
 
     @Test
-    void delete_ShouldDeleteDriver() {
-        when(driverRepository.existsById(1L)).thenReturn(true);
+    void delete_ShouldDeactivateDriver() {
+        when(driverRepository.findById(1L)).thenReturn(Optional.of(driver));
 
         driverService.delete(1L);
 
-        verify(driverRepository).deleteById(1L);
+        assertThat(driver.getActive()).isFalse();
+        verify(driverRepository).save(driver);
     }
 
     @Test
     void delete_ShouldThrowResourceNotFoundException() {
-        when(driverRepository.existsById(99L)).thenReturn(false);
+        when(driverRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> driverService.delete(99L))
                 .isInstanceOf(ResourceNotFoundException.class);
