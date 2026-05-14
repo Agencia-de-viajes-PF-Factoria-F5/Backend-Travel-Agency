@@ -2,6 +2,7 @@ package com.inditex.g1_agencia_viajes.service;
 
 import com.inditex.g1_agencia_viajes.dto.TripSegmentRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.TripSegmentResponseDTO;
+import com.inditex.g1_agencia_viajes.exception.DriverOverlapException;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
 import com.inditex.g1_agencia_viajes.mapper.TripSegmentMapper;
 import com.inditex.g1_agencia_viajes.model.Bus;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +55,15 @@ public class TripSegmentService {
         Driver driver = driverRepository.findById(dto.getDriverId())
                 .orElseThrow(() -> new ResourceNotFoundException("l conductor", dto.getDriverId()));
 
+        List<TripSegment> overlapping = tripSegmentRepository.findOverlappingByDriver(driver, dto.getStartTime(), dto.getEndTime());
+        if (!overlapping.isEmpty()) {
+            throw new DriverOverlapException(
+                    dto.getDriverId(),
+                    dto.getStartTime().toString(),
+                    dto.getEndTime().toString()
+            );
+        }
+
         TripSegment segment = tripSegmentMapper.toEntity(dto, travel, bus, driver);
         return tripSegmentMapper.toDTO(tripSegmentRepository.save(segment));
     }
@@ -68,6 +79,18 @@ public class TripSegmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("l bus", dto.getBusId()));
         Driver driver = driverRepository.findById(dto.getDriverId())
                 .orElseThrow(() -> new ResourceNotFoundException("l conductor", dto.getDriverId()));
+
+        List<TripSegment> overlapping = tripSegmentRepository.findOverlappingByDriver(driver, dto.getStartTime(), dto.getEndTime());
+        overlapping = overlapping.stream()
+                .filter(s -> !Objects.equals(s.getId(), id))
+                .toList();
+        if (!overlapping.isEmpty()) {
+            throw new DriverOverlapException(
+                    dto.getDriverId(),
+                    dto.getStartTime().toString(),
+                    dto.getEndTime().toString()
+            );
+        }
 
         segment.setTravel(travel);
         segment.setOrigin(dto.getOrigin());
