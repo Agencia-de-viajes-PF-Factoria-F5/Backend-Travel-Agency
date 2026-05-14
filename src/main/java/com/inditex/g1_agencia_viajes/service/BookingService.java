@@ -7,6 +7,7 @@ import com.inditex.g1_agencia_viajes.dto.BookingRequestDTO;
 import com.inditex.g1_agencia_viajes.dto.BookingResponseDTO;
 import com.inditex.g1_agencia_viajes.exception.MinorWithoutTutorException;
 import com.inditex.g1_agencia_viajes.exception.ResourceNotFoundException;
+import com.inditex.g1_agencia_viajes.exception.TravelNotAvailableException;
 import com.inditex.g1_agencia_viajes.mapper.BookingMapper;
 import com.inditex.g1_agencia_viajes.model.Booking;
 import com.inditex.g1_agencia_viajes.model.Employee;
@@ -32,6 +33,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final TravelRepository travelRepository;
     private final EmployeeRepository employeeRepository;
+    private final HotelService hotelService;
     private final BookingPricingService bookingPricingService;
     private final BookingMapper bookingMapper;
 
@@ -66,6 +68,17 @@ public class BookingService {
         List<User> resolvedCustomers = resolveCustomersByIds(dto.getCustomerIds());
         validateCustomersForBooking(resolvedCustomers);
         booking.setCustomers(resolvedCustomers);
+
+        int numPass = resolvedCustomers.size();
+        int availablePlaces = travel.getAvailablePlaces() == null ? 0 : travel.getAvailablePlaces();
+        if (availablePlaces < numPass) {
+            throw new TravelNotAvailableException(travel.getId());
+        }
+        if (travel.getHotel() != null) {
+            hotelService.reducirPlazas(travel.getHotel().getId(), numPass);
+        }
+        travel.setAvailablePlaces(availablePlaces - numPass);
+        travelRepository.save(travel);
 
         booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
         return bookingMapper.toDTO(bookingRepository.save(booking));
@@ -102,9 +115,20 @@ public class BookingService {
 
     @Transactional
     public void deleteById(Long id) {
-        if (!bookingRepository.existsById(id)) {
-            throw new ResourceNotFoundException(" la reserva", id);
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(" la reserva", id));
+
+        if (booking.getTravel() != null && booking.getTravel().getHotel() != null) {
+            hotelService.liberarPlazas(booking.getTravel().getHotel().getId(), booking.getCustomers().size());
         }
+
+        Travel travel = booking.getTravel();
+        if (travel != null) {
+            int availablePlaces = travel.getAvailablePlaces() == null ? 0 : travel.getAvailablePlaces();
+            travel.setAvailablePlaces(availablePlaces + booking.getCustomers().size());
+            travelRepository.save(travel);
+        }
+
         bookingRepository.deleteById(id);
     }
 
@@ -115,6 +139,20 @@ public class BookingService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("l usuario", request.getUserId()));
         validateMinorHasTutor(user);
+
+        Travel travel = booking.getTravel();
+        if (travel != null && travel.getHotel() != null) {
+            hotelService.reducirPlazas(travel.getHotel().getId(), 1);
+        }
+        if (travel != null) {
+            int availablePlaces = travel.getAvailablePlaces() == null ? 0 : travel.getAvailablePlaces();
+            if (availablePlaces < 1) {
+                throw new TravelNotAvailableException(travel.getId());
+            }
+            travel.setAvailablePlaces(availablePlaces - 1);
+            travelRepository.save(travel);
+        }
+
         booking.getCustomers().add(user);
         booking.setTotalPrice(bookingPricingService.calculateTotalPrice(booking));
         bookingRepository.save(booking);
