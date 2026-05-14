@@ -12,9 +12,6 @@ public class DriverRequestDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     private String phone;
 
-    @NotBlank(message = "La licencia es obligatoria")
-    private String enrollment;
-
     private Boolean licenceActive;
 
     private String imageUrl;

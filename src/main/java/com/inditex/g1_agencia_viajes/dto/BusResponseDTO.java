@@ -12,5 +12,4 @@ public class BusResponseDTO {
     private Boolean wifi;
     private Boolean AC;
     private Boolean USB;
-    private Boolean available;
 }
