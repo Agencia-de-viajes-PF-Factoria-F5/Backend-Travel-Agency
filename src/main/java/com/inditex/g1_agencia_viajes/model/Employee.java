@@ -41,6 +41,11 @@ public class Employee {
     @NotNull(message = "El estado de contratación es obligatorio")
     private Boolean hired;
 
+    @NotNull(message = "El rol es obligatorio")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
+
     @NotBlank(message = "La contraseña es obligatoria")
     @Column
     private String password;

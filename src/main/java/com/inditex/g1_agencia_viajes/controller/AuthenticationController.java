@@ -28,8 +28,8 @@ public class AuthenticationController {
         Employee employee = employeeRepository.findById(loginRequest.getId()).orElse(null);
 
         if (employee != null && BCrypt.checkpw(loginRequest.getPassword(), employee.getPassword())) {
-            String token = jwtUtil.crearToken(employee.getName(), employee.getEmployeeId());
-            return ResponseEntity.ok(new LoginResponse(token, employee.getEmployeeId(), employee.getName(), employee.getSurname()));
+            String token = jwtUtil.crearToken(employee.getName(), employee.getEmployeeId(), employee.getRole());
+            return ResponseEntity.ok(new LoginResponse(token, employee.getEmployeeId(), employee.getName(), employee.getSurname(), employee.getRole()));
         }
 
         return ResponseEntity.status(401).body("Usuario o contraseña incorrectos");

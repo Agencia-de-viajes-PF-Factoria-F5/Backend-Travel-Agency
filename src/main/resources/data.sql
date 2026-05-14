@@ -13,11 +13,11 @@ TRUNCATE TABLE users;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT INTO employees (name, surname, gender, work_hour, hired, password)
+INSERT INTO employees (name, surname, gender, work_hour, hired, password, role)
 VALUES
-    ('Juan', 'García', 'MALE', 40, true, '123456'),
-    ('Ana', 'López', 'FEMALE', 35, true, '123456'),
-    ('Carlos', 'Martínez', 'MALE', 40, true, '123456');
+    ('Juan', 'García', 'MALE', 40, true, '123456', 'ADMIN'),
+    ('Ana', 'López', 'FEMALE', 35, true, '123456', 'EDITOR'),
+    ('Carlos', 'Martínez', 'MALE', 40, true, '123456', 'VIEWER');
 
 INSERT INTO drivers (name, phone, licence_active, image_url) VALUES
     ('Pedro',  '612345678', true, null),

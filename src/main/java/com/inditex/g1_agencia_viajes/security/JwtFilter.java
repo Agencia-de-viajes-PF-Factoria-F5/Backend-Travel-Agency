@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.inditex.g1_agencia_viajes.model.Role;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,13 +24,22 @@ public class JwtFilter implements Filter {
 
         String path = req.getRequestURI();
 
-        // 1. Permitir el login sin token
-        if (path.equals("/api/authentication/login")) {
+        if (path.equals("/api/authentication/login")
+                || path.startsWith("/api/users")
+                || path.startsWith("/api/hotels")
+                || path.startsWith("/api/buses")
+                || path.startsWith("/api/drivers")
+                || path.startsWith("/api/travels")
+                || path.startsWith("/api/bookings")
+                || path.startsWith("/api/offers")
+                || path.startsWith("/api/employees")
+                || path.startsWith("/api/trip-segments")
+                || path.startsWith("/api-docs")
+                || path.startsWith("/swagger-ui")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 2. Obtener el token de la cabecera "Authorization"
         String authHeader = req.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -40,15 +50,28 @@ public class JwtFilter implements Filter {
         String token = authHeader.substring(7);
 
         try {
-            // 3. Validar el token
             Algorithm algoritmo = Algorithm.HMAC256("your_secret_password");
             JWTVerifier verifier = JWT.require(algoritmo).withIssuer("agencia-viajes").build();
             DecodedJWT jwt = verifier.verify(token);
 
-            // Opcional: Guardar los datos del empleado en el request por si el controlador los necesita
-            req.setAttribute("id", jwt.getClaim("id").asLong());
+            String roleStr = jwt.getClaim("role").asString();
+            Role role = roleStr != null ? Role.valueOf(roleStr) : null;
+            String method = req.getMethod();
 
-            chain.doFilter(request, response); // Todo OK, continúa a tu Controlador
+            if (role == Role.VIEWER && !method.equals("GET")) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, "No tienes permisos para modificar datos");
+                return;
+            }
+
+            if (role == Role.EDITOR && !method.equals("GET") && path.startsWith("/api/employees")) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, "No tienes permisos para gestionar empleados");
+                return;
+            }
+
+            req.setAttribute("id", jwt.getClaim("id").asLong());
+            req.setAttribute("role", role);
+
+            chain.doFilter(request, response);
         } catch (JWTVerificationException exception) {
             res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o expirado");
         }
